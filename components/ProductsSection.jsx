@@ -1,8 +1,6 @@
 export default function ProductsSection({ products = [] }) {
   const placeholder = [
-    { id: 1, name: "AppCore", description: "Core infrastructure tool for modern app development.", link: "#", image: null },
-    { id: 2, name: "DataViz Pro", description: "Real-time analytics and visualization dashboard.", link: "#", image: null },
-    { id: 3, name: "SecureKit", description: "End-to-end security suite for web applications.", link: "#", image: null },
+    { id: "sample", name: "Coming Soon", description: "Our first product is in the works. Stay tuned!", link: null, image: null },
   ];
   const items = products.length > 0 ? products : placeholder;
   return (
@@ -22,7 +20,7 @@ export default function ProductsSection({ products = [] }) {
             <div style={{ padding: 16 }}>
               <h3 style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", marginBottom: 6 }}>{product.name}</h3>
               <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 12 }}>{product.description}</p>
-              <a href={product.link} style={{ fontSize: 10, color: "var(--accent)", textDecoration: "none", letterSpacing: 1 }}>LEARN MORE →</a>
+              {product.link && <a href={product.link} style={{ fontSize: 10, color: "var(--accent)", textDecoration: "none", letterSpacing: 1 }}>LEARN MORE →</a>}
             </div>
           </div>
         ))}

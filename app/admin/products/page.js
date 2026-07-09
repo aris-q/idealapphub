@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { auth, storage } from "../../../lib/firebase";
+import { auth, storage, db } from "../../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { collection, getDocs, addDoc, deleteDoc, doc, orderBy, query } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 
@@ -30,8 +31,9 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     console.log("[PRODUCTS] Fetching...");
-    const res = await fetch("/api/products");
-    const data = await res.json();
+    const q = query(collection(db, "products"), orderBy("name", "asc"));
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
     console.log("[PRODUCTS] Fetched:", data);
     setProducts(data);
   };
@@ -53,13 +55,8 @@ export default function AdminProducts() {
       if (imageFile) imageUrl = await uploadImage(imageFile);
       const payload = { ...form, image: imageUrl };
       console.log("[PRODUCTS] Saving:", payload);
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      console.log("[PRODUCTS] Saved:", data);
+      const docRef = await addDoc(collection(db, "products"), payload);
+      console.log("[PRODUCTS] Saved id:", docRef.id);
       setForm({ name: "", description: "", link: "", videoUrl: "", image: null });
       setImageFile(null);
       await fetchProducts();
@@ -71,7 +68,7 @@ export default function AdminProducts() {
 
   const handleDelete = async (id) => {
     console.log("[PRODUCTS] Deleting id:", id);
-    await fetch(`/api/products/${id}`, { method: "DELETE" });
+    await deleteDoc(doc(db, "products", id));
     await fetchProducts();
   };
 

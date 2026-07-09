@@ -16,10 +16,9 @@ export default function Navbar() {
       </Link>
 
       <div style={{ display: "flex", gap: 24, fontSize: 12, color: "var(--text-muted)" }}>
-        <Link href="#news" style={{ color: "var(--text-muted)", textDecoration: "none" }}>News</Link>
-        <Link href="#products" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Products</Link>
-        <Link href="#about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>About</Link>
-        <Link href="#contact" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Contact</Link>
+        <Link href="/#news" style={{ color: "var(--text-muted)", textDecoration: "none" }}>News</Link>
+        <Link href="/products" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Products</Link>
+        <Link href="/#contact" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Contact</Link>
       </div>
 
       <Link href="/admin/login" style={{
