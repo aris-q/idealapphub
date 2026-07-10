@@ -1,10 +1,32 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { PromptMark } from "./Brand";
 
+const LINKS = [
+  { label: "News", href: "/#news" },
+  { label: "Podcast", href: "/#podcast" },
+  { label: "Hackathons", href: "/#hackathons" },
+  { label: "Products", href: "/products" },
+  { label: "Contact", href: "/#contact" },
+];
+
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [hash, setHash] = useState("");
+
+  useEffect(() => {
+    const update = () => setHash(window.location.hash);
+    update();
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
+
+  const isActive = (href) =>
+    href === "/products"
+      ? pathname === "/products"
+      : pathname === "/" && hash === href.slice(1);
 
   return (
     <nav style={{
@@ -17,12 +39,20 @@ export default function Navbar() {
         IDEALAPP<span style={{ color: "var(--text-primary)" }}>HUB</span>
       </Link>
 
-      <div style={{ display: "flex", gap: 24, fontSize: 12, color: "var(--text-muted)" }}>
-        <Link href="/#news" style={{ color: "var(--text-muted)", textDecoration: "none" }}>News</Link>
-        <Link href="/#podcast" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Podcast</Link>
-        <Link href="/#hackathons" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Hackathons</Link>
-        <Link href="/products" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Products</Link>
-        <Link href="/#contact" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Contact</Link>
+      <div style={{ display: "flex", gap: 8, fontSize: 12 }}>
+        {LINKS.map(({ label, href }) => {
+          const active = isActive(href);
+          return (
+            <Link key={href} href={href} onClick={() => setHash(href.startsWith("/#") ? href.slice(1) : "")} style={{
+              padding: "6px 12px", borderRadius: 4, textDecoration: "none",
+              letterSpacing: 1, fontWeight: active ? 700 : 400,
+              color: active ? "#060910" : "var(--text-muted)",
+              background: active ? "var(--accent)" : "transparent",
+            }}>
+              {label}
+            </Link>
+          );
+        })}
       </div>
 
       <Link href="/admin/login" style={{

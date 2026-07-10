@@ -28,7 +28,7 @@ export default function HackathonSection({ events = [] }) {
         <Icon name="event" size={20} />
         Hackathons
       </h2>
-      <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 20 }}>
+      <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 20 }}>
         In-person events in the USA and Canada over the next 6 months, via <a href="https://devpost.com/hackathons" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", textDecoration: "none" }}>Devpost</a>
       </p>
 
@@ -41,7 +41,7 @@ export default function HackathonSection({ events = [] }) {
           <option value="all">All months</option>
           {MONTH_NAMES.map((m, i) => <option key={m} value={i}>{m}</option>)}
         </select>
-        <span style={{ alignSelf: "center", fontSize: 11, color: "var(--text-muted)" }}>
+        <span style={{ alignSelf: "center", fontSize: 12, color: "var(--text-muted)" }}>
           {filtered.length} event{filtered.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -57,9 +57,9 @@ export default function HackathonSection({ events = [] }) {
           background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6,
           marginBottom: 8, textDecoration: "none", flexWrap: "wrap"
         }}>
-          <span style={{ fontSize: 10, color: "var(--accent)", whiteSpace: "nowrap", minWidth: 130 }}>{e.dates}</span>
+          <span style={{ fontSize: 12, color: "var(--accent)", whiteSpace: "nowrap", minWidth: 150 }}>{e.dates}</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.5, flex: 1, minWidth: 200 }}>{e.title}</span>
-          <span style={{ fontSize: 10, color: "var(--text-muted)", whiteSpace: "nowrap" }}>📍 {e.location}</span>
+          <span style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap" }}>📍 {e.location}</span>
         </a>
       ))}
     </section>

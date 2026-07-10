@@ -23,8 +23,8 @@ export default function ProductsSection({ products = [] }) {
             </div>
             <div style={{ padding: 16 }}>
               <h3 style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", marginBottom: 6 }}>{product.name}</h3>
-              <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 12 }}>{product.description}</p>
-              {product.link && <a href={product.link} style={{ fontSize: 10, color: "var(--accent)", textDecoration: "none", letterSpacing: 1 }}>LEARN MORE →</a>}
+              <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 12 }}>{product.description}</p>
+              {product.link && <a href={product.link} style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", letterSpacing: 1 }}>LEARN MORE →</a>}
             </div>
           </div>
         ))}

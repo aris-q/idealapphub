@@ -4,7 +4,7 @@ service cloud.firestore {
     // Admin allowlist — keep in sync with lib/admins.js.
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email in ['idealapphub@gmail.com'];
+        && request.auth.token.email in ['idealapphub@gmail.com', 'voiceapplication2025@gmail.com'];
     }
 
     // Public site content: anyone can read, only admins can write.

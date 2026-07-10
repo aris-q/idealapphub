@@ -58,6 +58,10 @@ export default function AdminDashboard() {
             <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Products</h2>
             <p style={{ fontSize: 11, color: "#7a9cc8" }}>Add, edit or remove products</p>
           </div>
+          <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" style={{ background: "#0f1628", border: "1px solid #1a2a4a", borderRadius: 8, padding: 24, cursor: "pointer", textDecoration: "none", display: "block" }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Site Analytics ↗</h2>
+            <p style={{ fontSize: 11, color: "#7a9cc8" }}>Visitors, page views & devices — opens your Vercel dashboard (Analytics tab)</p>
+          </a>
         </div>
       </main>
     </div>
