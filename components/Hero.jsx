@@ -10,7 +10,9 @@ export default function Hero() {
         backgroundSize: "40px 40px", zIndex: 0
       }} />
       <div style={{ position: "relative", zIndex: 1 }}>
-        <p style={{ fontSize: 10, letterSpacing: 4, color: "var(--accent)", marginBottom: 16 }}>// NEXT-GEN APP PLATFORM</p>
+        <p style={{ fontSize: 10, letterSpacing: 4, color: "var(--accent)", marginBottom: 16 }}>
+          {"> "}NEXT-GEN APP PLATFORM<span className="brand-blink" style={{ marginLeft: 6 }}>▮</span>
+        </p>
         <h1 style={{ fontSize: 36, fontWeight: 700, lineHeight: 1.2, color: "#fff", marginBottom: 12 }}>
           Your Hub for <span style={{ color: "var(--accent)" }}>Ideal Apps</span>
         </h1>

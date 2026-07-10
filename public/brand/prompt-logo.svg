@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="72" viewBox="0 0 380 72">
+  <rect x="2" y="8" width="56" height="56" rx="10" fill="none" stroke="#4af0ff" stroke-width="2.5"/>
+  <path d="M14 26 L26 36 L14 46" fill="none" stroke="#4af0ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="32" y="42" width="13" height="4" rx="1" fill="#4af0ff"/>
+  <text x="76" y="46" font-family="Courier New, monospace" font-size="26" font-weight="bold" letter-spacing="3" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text>
+  <text x="78" y="62" font-family="Courier New, monospace" font-size="9" letter-spacing="5" fill="#7a9cc8">// NEXT-GEN APP PLATFORM</text>
+</svg>

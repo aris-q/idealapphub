@@ -1,11 +1,13 @@
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import AINewsSection from "../components/AINewsSection";
+import PodcastSection from "../components/PodcastSection";
+import HackathonSection from "../components/HackathonSection";
 import ContactSection from "../components/ContactSection";
 import Footer from "../components/Footer";
 import { db } from "../lib/firebase";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { getHackerNewsAI, getAllInVideos, bucketByDate } from "../lib/aiNews";
+import { getHackerNewsAI, getAllInVideos, getHackathons, bucketByDate } from "../lib/aiNews";
 
 export const dynamic = "force-dynamic";
 
@@ -34,15 +36,16 @@ async function getOwnNews() {
 }
 
 export default async function Home() {
-  const [ownNews, hnNews, allInNews] = await Promise.all([
+  const [ownNews, hnNews, episodes, hackathons] = await Promise.all([
     getOwnNews(),
     getHackerNewsAI(),
     getAllInVideos(),
+    getHackathons(),
   ]);
 
   const highlights = ownNews.filter((item) => item.highlight);
   const rest = ownNews.filter((item) => !item.highlight);
-  const { today, week } = bucketByDate([...rest, ...hnNews, ...allInNews]);
+  const { today, week } = bucketByDate([...rest, ...hnNews]);
 
   return (
     <>
@@ -50,6 +53,8 @@ export default async function Home() {
       <main>
         <Hero />
         <AINewsSection highlights={highlights} today={today} week={week} />
+        <PodcastSection episodes={episodes} />
+        <HackathonSection events={hackathons} />
         <ContactSection />
       </main>
       <Footer />

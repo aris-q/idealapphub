@@ -1,3 +1,5 @@
+import { Icon, LiveBadge } from "./Brand";
+
 const SOURCE_COLORS = {
   IdealAppHub: "var(--accent)",
   "Hacker News": "#ff6600",
@@ -41,12 +43,19 @@ function NewsRow({ item }) {
 export default function AINewsSection({ highlights = [], today = [], week = [] }) {
   return (
     <section id="news" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
-      <p style={{ fontSize: 10, letterSpacing: 4, color: "var(--accent)", marginBottom: 8 }}>// AI NEWS</p>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>AI News & Updates</h2>
+      <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>
+        <Icon name="news" size={20} />
+        AI News & Updates
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 9, letterSpacing: 2, color: "var(--text-muted)", fontWeight: 400 }}>
+          <LiveBadge size={14} /> LIVE
+        </span>
+      </h2>
 
       {highlights.length > 0 && (
         <div style={{ marginBottom: 32 }}>
-          <p style={{ fontSize: 11, letterSpacing: 3, color: "var(--accent)", marginBottom: 12 }}>★ HIGHLIGHTS</p>
+          <p style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, letterSpacing: 3, color: "var(--accent)", marginBottom: 12 }}>
+            <Icon name="highlight" size={14} /> HIGHLIGHTS
+          </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
             {highlights.map((item) => (
               <a key={item.id} href={item.link || "#"} target={item.link ? "_blank" : undefined} rel="noopener noreferrer" style={{

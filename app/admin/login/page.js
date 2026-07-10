@@ -3,6 +3,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import { useRouter } from "next/navigation";
+import { BracketMark } from "../../../components/Brand";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -39,8 +40,8 @@ export default function AdminLogin() {
   return (
     <div style={{ minHeight: "100vh", background: "#0a0e1a", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ background: "#0f1628", border: "1px solid #1a2a4a", borderRadius: 8, padding: 40, width: "100%", maxWidth: 400 }}>
-        <p style={{ fontSize: 10, letterSpacing: 4, color: "#4af0ff", marginBottom: 8 }}>// ADMIN</p>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>Login</h1>
+        <div style={{ marginBottom: 16 }}><BracketMark size={36} /></div>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>Admin Login</h1>
         <form onSubmit={handleLogin}>
           <input style={inputStyle} type="email" placeholder="Email" value={email}
             onChange={(e) => setEmail(e.target.value)} required />
@@ -55,6 +56,7 @@ export default function AdminLogin() {
             {loading ? "LOGGING IN..." : "LOGIN"}
           </button>
         </form>
+        <a href="/" style={{ display: "block", marginTop: 16, fontSize: 11, color: "#7a9cc8", textDecoration: "none" }}>← Go home</a>
       </div>
     </div>
   );

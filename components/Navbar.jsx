@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { PromptMark } from "./Brand";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,12 +12,15 @@ export default function Navbar() {
       padding: "14px 32px", background: "#060910",
       borderBottom: "1px solid var(--border)", position: "sticky", top: 0, zIndex: 100
     }}>
-      <Link href="/" style={{ fontSize: 18, fontWeight: 700, color: "var(--accent)", letterSpacing: 2, textDecoration: "none" }}>
-        IDEALAPPHUB
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 18, fontWeight: 700, color: "var(--accent)", letterSpacing: 2, textDecoration: "none" }}>
+        <PromptMark size={26} animated />
+        IDEALAPP<span style={{ color: "var(--text-primary)" }}>HUB</span>
       </Link>
 
       <div style={{ display: "flex", gap: 24, fontSize: 12, color: "var(--text-muted)" }}>
         <Link href="/#news" style={{ color: "var(--text-muted)", textDecoration: "none" }}>News</Link>
+        <Link href="/#podcast" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Podcast</Link>
+        <Link href="/#hackathons" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Hackathons</Link>
         <Link href="/products" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Products</Link>
         <Link href="/#contact" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Contact</Link>
       </div>

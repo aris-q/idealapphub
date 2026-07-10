@@ -1,0 +1,348 @@
+<title>IdealAppHub — Logo Concepts</title>
+<style>
+  :root {
+    --bg: #060910;
+    --panel: #0a0e1a;
+    --card: #0f1628;
+    --border: #1a2a4a;
+    --accent: #4af0ff;
+    --muted: #7a9cc8;
+    --text: #e0e8ff;
+    --mono: "Courier New", Courier, monospace;
+  }
+  html { background: var(--bg); }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    margin: 0;
+    padding: 48px 24px 96px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .eyebrow { font-size: 11px; letter-spacing: 4px; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: 26px; letter-spacing: 2px; margin: 0 0 12px; color: #fff; }
+  .lede { font-size: 13px; color: var(--muted); max-width: 62ch; margin: 0 0 48px; }
+  .concept {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    margin-bottom: 48px;
+    overflow: hidden;
+  }
+  .concept-head {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .concept-head .num { color: var(--accent); font-size: 12px; letter-spacing: 2px; }
+  .concept-head h2 { font-size: 16px; margin: 0; letter-spacing: 1px; color: #fff; }
+  .concept-head .tag { margin-left: auto; font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+  .hero-stage {
+    display: flex; align-items: center; justify-content: center;
+    padding: 56px 24px;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 50%, rgba(74,240,255,0.05), transparent),
+      var(--bg);
+  }
+  .concept-body { padding: 20px 24px 24px; }
+  .rationale { font-size: 12px; color: var(--muted); max-width: 68ch; margin: 0 0 20px; }
+  .rationale b { color: var(--text); font-weight: 700; }
+  .row-label { font-size: 10px; letter-spacing: 3px; color: var(--accent); margin: 0 0 10px; }
+  .size-row {
+    display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+    padding: 18px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--card); margin-bottom: 16px;
+  }
+  .size-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .size-cell span { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+  .ground-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .ground {
+    flex: 1; min-width: 200px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 22px; border-radius: 6px; border: 1px solid var(--border);
+  }
+  .ground.dark { background: var(--bg); }
+  .ground.light { background: #eef2f7; border-color: #c8d4e4; }
+  .tabmock {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #1a2334; border-radius: 8px 8px 0 0;
+    padding: 7px 16px 7px 10px; font-size: 11px; color: var(--text);
+  }
+  .tabmock .fav { width: 16px; height: 16px; }
+  section.icons, section.motion { margin-bottom: 48px; }
+  .icon-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  .icon-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+    padding: 18px 8px 12px;
+  }
+  .icon-cell span { font-size: 9px; letter-spacing: 2px; color: var(--muted); }
+  .motion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .motion-cell {
+    background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+    padding: 24px 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .motion-cell span { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-align: center; }
+  h3.sec { font-size: 14px; letter-spacing: 2px; color: #fff; margin: 0 0 6px; }
+  p.secdesc { font-size: 12px; color: var(--muted); margin: 0 0 20px; max-width: 68ch; }
+
+  /* --- animations --- */
+  .blink { animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
+  .pulse { animation: pulse 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes pulse { 0%,100% { opacity: .25; transform: scale(1); } 50% { opacity: .9; transform: scale(1.18); } }
+  .spin { animation: spin 6s linear infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .scan { animation: scan 2.8s ease-in-out infinite; }
+  @keyframes scan { 0%,100% { transform: translateY(-9px); } 50% { transform: translateY(9px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .blink, .pulse, .spin, .scan { animation: none; }
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">// IDENTITY PITCH</p>
+  <h1>IDEALAPPHUB — three logo concepts</h1>
+  <p class="lede">All three are hand-built SVG in your site's existing palette and mono voice — crisp at 16px favicon and at hero size, one cyan accent, no gradients. Each is shown with a size ladder, a browser-tab mock, and a light-ground check. Pick one and I wire it into the navbar, hero and favicon.</p>
+
+  <!-- ============ CONCEPT 1 ============ -->
+  <div class="concept">
+    <div class="concept-head">
+      <span class="num">01</span>
+      <h2>THE PROMPT</h2>
+      <span class="tag">TERMINAL CURSOR</span>
+    </div>
+    <div class="hero-stage">
+      <svg width="380" height="72" viewBox="0 0 380 72" role="img" aria-label="IdealAppHub logo, concept 1">
+        <rect x="2" y="8" width="56" height="56" rx="10" fill="none" stroke="#4af0ff" stroke-width="2.5"/>
+        <path d="M14 26 L26 36 L14 46" fill="none" stroke="#4af0ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect class="blink" x="32" y="42" width="13" height="4" rx="1" fill="#4af0ff"/>
+        <text x="76" y="46" font-family="Courier New, monospace" font-size="26" font-weight="bold" letter-spacing="3" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text>
+        <text x="78" y="62" font-family="Courier New, monospace" font-size="9" letter-spacing="5" fill="#7a9cc8">// NEXT-GEN APP PLATFORM</text>
+      </svg>
+    </div>
+    <div class="concept-body">
+      <p class="rationale"><b>A terminal prompt waiting for input.</b> The rounded square is a console window, the chevron-plus-cursor is the classic <b>&gt;_</b> prompt — and the cursor actually blinks (CSS, not a GIF). It says "built by people who live in the terminal" and echoes the <b>//</b> comments already all over your site.</p>
+      <p class="row-label">SIZE LADDER</p>
+      <div class="size-row">
+        <div class="size-cell">
+          <svg width="64" height="64" viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" rx="10" fill="none" stroke="#4af0ff" stroke-width="3"/><path d="M16 22 L28 32 L16 42" fill="none" stroke="#4af0ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="38" width="14" height="5" rx="1" fill="#4af0ff"/></svg>
+          <span>64</span>
+        </div>
+        <div class="size-cell">
+          <svg width="32" height="32" viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" rx="10" fill="none" stroke="#4af0ff" stroke-width="4"/><path d="M16 22 L28 32 L16 42" fill="none" stroke="#4af0ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="37" width="14" height="6" rx="1" fill="#4af0ff"/></svg>
+          <span>32</span>
+        </div>
+        <div class="size-cell">
+          <svg width="16" height="16" viewBox="0 0 64 64"><rect x="3" y="3" width="58" height="58" rx="12" fill="#4af0ff"/><path d="M16 22 L28 32 L16 42" fill="none" stroke="#060910" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="36" width="15" height="7" rx="1" fill="#060910"/></svg>
+          <span>16 FAVICON</span>
+        </div>
+        <div class="size-cell">
+          <div class="tabmock">
+            <svg class="fav" viewBox="0 0 64 64"><rect x="3" y="3" width="58" height="58" rx="12" fill="#4af0ff"/><path d="M16 22 L28 32 L16 42" fill="none" stroke="#060910" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="36" width="15" height="7" rx="1" fill="#060910"/></svg>
+            IdealAppHub
+          </div>
+          <span>BROWSER TAB</span>
+        </div>
+      </div>
+      <p class="row-label">GROUND CHECK</p>
+      <div class="ground-row">
+        <div class="ground dark">
+          <svg width="150" height="34" viewBox="0 0 300 60"><rect x="2" y="6" width="48" height="48" rx="9" fill="none" stroke="#4af0ff" stroke-width="2.5"/><path d="M12 21 L23 30 L12 39" fill="none" stroke="#4af0ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="28" y="35" width="12" height="4" fill="#4af0ff"/><text x="64" y="40" font-family="Courier New, monospace" font-size="24" font-weight="bold" letter-spacing="2" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text></svg>
+        </div>
+        <div class="ground light">
+          <svg width="150" height="34" viewBox="0 0 300 60"><rect x="2" y="6" width="48" height="48" rx="9" fill="none" stroke="#0a7f92" stroke-width="2.5"/><path d="M12 21 L23 30 L12 39" fill="none" stroke="#0a7f92" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="28" y="35" width="12" height="4" fill="#0a7f92"/><text x="64" y="40" font-family="Courier New, monospace" font-size="24" font-weight="bold" letter-spacing="2" fill="#101a2c">IDEALAPP<tspan fill="#0a7f92">HUB</tspan></text></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONCEPT 2 ============ -->
+  <div class="concept">
+    <div class="concept-head">
+      <span class="num">02</span>
+      <h2>THE HUB</h2>
+      <span class="tag">NETWORK NODE</span>
+    </div>
+    <div class="hero-stage">
+      <svg width="380" height="72" viewBox="0 0 380 72" role="img" aria-label="IdealAppHub logo, concept 2">
+        <g stroke="#4af0ff" stroke-width="2">
+          <line x1="30" y1="36" x2="30" y2="12" opacity=".5"/>
+          <line x1="30" y1="36" x2="30" y2="60" opacity=".5"/>
+          <line x1="30" y1="36" x2="9"  y2="24" opacity=".5"/>
+          <line x1="30" y1="36" x2="51" y2="24" opacity=".5"/>
+          <line x1="30" y1="36" x2="9"  y2="48" opacity=".5"/>
+          <line x1="30" y1="36" x2="51" y2="48" opacity=".5"/>
+        </g>
+        <g fill="#0f1628" stroke="#4af0ff" stroke-width="2">
+          <rect x="25" y="7"  width="10" height="10" rx="2"/>
+          <rect x="25" y="55" width="10" height="10" rx="2"/>
+          <rect x="4"  y="19" width="10" height="10" rx="2"/>
+          <rect x="46" y="19" width="10" height="10" rx="2"/>
+          <rect x="4"  y="43" width="10" height="10" rx="2"/>
+          <rect x="46" y="43" width="10" height="10" rx="2"/>
+        </g>
+        <circle class="pulse" cx="30" cy="36" r="12" fill="#4af0ff" opacity=".25"/>
+        <circle cx="30" cy="36" r="7" fill="#4af0ff"/>
+        <text x="76" y="46" font-family="Courier New, monospace" font-size="26" font-weight="bold" letter-spacing="3" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text>
+        <text x="78" y="62" font-family="Courier New, monospace" font-size="9" letter-spacing="5" fill="#7a9cc8">// NEXT-GEN APP PLATFORM</text>
+      </svg>
+    </div>
+    <div class="concept-body">
+      <p class="rationale"><b>A literal hub.</b> Six app tiles orbit one glowing core — the most direct read of the name. The core pulses gently (CSS). Strongest at storytelling: your site is the center, apps and news feeds connect to it. Busiest of the three at favicon size, so the 16px version drops to core-plus-four-tiles.</p>
+      <p class="row-label">SIZE LADDER</p>
+      <div class="size-row">
+        <div class="size-cell">
+          <svg width="64" height="64" viewBox="0 0 64 64"><g stroke="#4af0ff" stroke-width="2" opacity=".5"><line x1="32" y1="32" x2="32" y2="8"/><line x1="32" y1="32" x2="32" y2="56"/><line x1="32" y1="32" x2="10" y2="19"/><line x1="32" y1="32" x2="54" y2="19"/><line x1="32" y1="32" x2="10" y2="45"/><line x1="32" y1="32" x2="54" y2="45"/></g><g fill="#0f1628" stroke="#4af0ff" stroke-width="2"><rect x="27" y="3" width="10" height="10" rx="2"/><rect x="27" y="51" width="10" height="10" rx="2"/><rect x="5" y="14" width="10" height="10" rx="2"/><rect x="49" y="14" width="10" height="10" rx="2"/><rect x="5" y="40" width="10" height="10" rx="2"/><rect x="49" y="40" width="10" height="10" rx="2"/></g><circle cx="32" cy="32" r="7" fill="#4af0ff"/></svg>
+          <span>64</span>
+        </div>
+        <div class="size-cell">
+          <svg width="32" height="32" viewBox="0 0 64 64"><g stroke="#4af0ff" stroke-width="3" opacity=".55"><line x1="32" y1="32" x2="32" y2="9"/><line x1="32" y1="32" x2="32" y2="55"/><line x1="32" y1="32" x2="9" y2="32"/><line x1="32" y1="32" x2="55" y2="32"/></g><g fill="#0f1628" stroke="#4af0ff" stroke-width="3"><rect x="26" y="3" width="12" height="12" rx="2"/><rect x="26" y="49" width="12" height="12" rx="2"/><rect x="3" y="26" width="12" height="12" rx="2"/><rect x="49" y="26" width="12" height="12" rx="2"/></g><circle cx="32" cy="32" r="8" fill="#4af0ff"/></svg>
+          <span>32</span>
+        </div>
+        <div class="size-cell">
+          <svg width="16" height="16" viewBox="0 0 64 64"><rect x="3" y="3" width="58" height="58" rx="12" fill="#4af0ff"/><g stroke="#060910" stroke-width="4" opacity=".8"><line x1="32" y1="32" x2="32" y2="12"/><line x1="32" y1="32" x2="32" y2="52"/><line x1="32" y1="32" x2="12" y2="32"/><line x1="32" y1="32" x2="52" y2="32"/></g><circle cx="32" cy="32" r="10" fill="#060910"/></svg>
+          <span>16 FAVICON</span>
+        </div>
+        <div class="size-cell">
+          <div class="tabmock">
+            <svg class="fav" viewBox="0 0 64 64"><rect x="3" y="3" width="58" height="58" rx="12" fill="#4af0ff"/><g stroke="#060910" stroke-width="4" opacity=".8"><line x1="32" y1="32" x2="32" y2="12"/><line x1="32" y1="32" x2="32" y2="52"/><line x1="32" y1="32" x2="12" y2="32"/><line x1="32" y1="32" x2="52" y2="32"/></g><circle cx="32" cy="32" r="10" fill="#060910"/></svg>
+            IdealAppHub
+          </div>
+          <span>BROWSER TAB</span>
+        </div>
+      </div>
+      <p class="row-label">GROUND CHECK</p>
+      <div class="ground-row">
+        <div class="ground dark">
+          <svg width="150" height="34" viewBox="0 0 300 60"><g stroke="#4af0ff" stroke-width="2" opacity=".5"><line x1="26" y1="30" x2="26" y2="8"/><line x1="26" y1="30" x2="26" y2="52"/><line x1="26" y1="30" x2="7" y2="19"/><line x1="26" y1="30" x2="45" y2="19"/><line x1="26" y1="30" x2="7" y2="41"/><line x1="26" y1="30" x2="45" y2="41"/></g><circle cx="26" cy="30" r="6" fill="#4af0ff"/><text x="60" y="38" font-family="Courier New, monospace" font-size="24" font-weight="bold" letter-spacing="2" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text></svg>
+        </div>
+        <div class="ground light">
+          <svg width="150" height="34" viewBox="0 0 300 60"><g stroke="#0a7f92" stroke-width="2" opacity=".6"><line x1="26" y1="30" x2="26" y2="8"/><line x1="26" y1="30" x2="26" y2="52"/><line x1="26" y1="30" x2="7" y2="19"/><line x1="26" y1="30" x2="45" y2="19"/><line x1="26" y1="30" x2="7" y2="41"/><line x1="26" y1="30" x2="45" y2="41"/></g><circle cx="26" cy="30" r="6" fill="#0a7f92"/><text x="60" y="38" font-family="Courier New, monospace" font-size="24" font-weight="bold" letter-spacing="2" fill="#101a2c">IDEALAPP<tspan fill="#0a7f92">HUB</tspan></text></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONCEPT 3 ============ -->
+  <div class="concept">
+    <div class="concept-head">
+      <span class="num">03</span>
+      <h2>THE BRACKET MONOGRAM</h2>
+      <span class="tag">CODE GLYPH</span>
+    </div>
+    <div class="hero-stage">
+      <svg width="380" height="72" viewBox="0 0 380 72" role="img" aria-label="IdealAppHub logo, concept 3">
+        <path d="M18 10 H6 V62 H18" fill="none" stroke="#4af0ff" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M46 10 H58 V62 H46" fill="none" stroke="#4af0ff" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M24 22 V50 M40 22 V50 M24 36 H40" fill="none" stroke="#e0e8ff" stroke-width="4.5" stroke-linecap="round"/>
+        <text x="76" y="46" font-family="Courier New, monospace" font-size="26" font-weight="bold" letter-spacing="3" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text>
+        <text x="78" y="62" font-family="Courier New, monospace" font-size="9" letter-spacing="5" fill="#7a9cc8">// NEXT-GEN APP PLATFORM</text>
+      </svg>
+    </div>
+    <div class="concept-body">
+      <p class="rationale"><b>[H] — the Hub, in brackets.</b> An array holding one element: H. The quietest and most timeless of the three; it's basically a typographic mark, so it never fights the content, scales perfectly, and works anywhere — invoices, avatars, watermarks. Zero animation needed (though the brackets can pulse on hover if you want).</p>
+      <p class="row-label">SIZE LADDER</p>
+      <div class="size-row">
+        <div class="size-cell">
+          <svg width="64" height="64" viewBox="0 0 64 64"><path d="M16 8 H6 V56 H16" fill="none" stroke="#4af0ff" stroke-width="3.5" stroke-linecap="round"/><path d="M48 8 H58 V56 H48" fill="none" stroke="#4af0ff" stroke-width="3.5" stroke-linecap="round"/><path d="M24 18 V46 M40 18 V46 M24 32 H40" fill="none" stroke="#e0e8ff" stroke-width="4.5" stroke-linecap="round"/></svg>
+          <span>64</span>
+        </div>
+        <div class="size-cell">
+          <svg width="32" height="32" viewBox="0 0 64 64"><path d="M16 8 H6 V56 H16" fill="none" stroke="#4af0ff" stroke-width="5" stroke-linecap="round"/><path d="M48 8 H58 V56 H48" fill="none" stroke="#4af0ff" stroke-width="5" stroke-linecap="round"/><path d="M24 18 V46 M40 18 V46 M24 32 H40" fill="none" stroke="#e0e8ff" stroke-width="6" stroke-linecap="round"/></svg>
+          <span>32</span>
+        </div>
+        <div class="size-cell">
+          <svg width="16" height="16" viewBox="0 0 64 64"><rect x="3" y="3" width="58" height="58" rx="12" fill="#4af0ff"/><path d="M22 16 V48 M42 16 V48 M22 32 H42" fill="none" stroke="#060910" stroke-width="8" stroke-linecap="round"/></svg>
+          <span>16 FAVICON</span>
+        </div>
+        <div class="size-cell">
+          <div class="tabmock">
+            <svg class="fav" viewBox="0 0 64 64"><rect x="3" y="3" width="58" height="58" rx="12" fill="#4af0ff"/><path d="M22 16 V48 M42 16 V48 M22 32 H42" fill="none" stroke="#060910" stroke-width="8" stroke-linecap="round"/></svg>
+            IdealAppHub
+          </div>
+          <span>BROWSER TAB</span>
+        </div>
+      </div>
+      <p class="row-label">GROUND CHECK</p>
+      <div class="ground-row">
+        <div class="ground dark">
+          <svg width="150" height="34" viewBox="0 0 300 60"><path d="M14 8 H6 V52 H14" fill="none" stroke="#4af0ff" stroke-width="3" stroke-linecap="round"/><path d="M40 8 H48 V52 H40" fill="none" stroke="#4af0ff" stroke-width="3" stroke-linecap="round"/><path d="M20 17 V43 M34 17 V43 M20 30 H34" fill="none" stroke="#e0e8ff" stroke-width="4" stroke-linecap="round"/><text x="62" y="38" font-family="Courier New, monospace" font-size="24" font-weight="bold" letter-spacing="2" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text></svg>
+        </div>
+        <div class="ground light">
+          <svg width="150" height="34" viewBox="0 0 300 60"><path d="M14 8 H6 V52 H14" fill="none" stroke="#0a7f92" stroke-width="3" stroke-linecap="round"/><path d="M40 8 H48 V52 H40" fill="none" stroke="#0a7f92" stroke-width="3" stroke-linecap="round"/><path d="M20 17 V43 M34 17 V43 M20 30 H34" fill="none" stroke="#101a2c" stroke-width="4" stroke-linecap="round"/><text x="62" y="38" font-family="Courier New, monospace" font-size="24" font-weight="bold" letter-spacing="2" fill="#101a2c">IDEALAPP<tspan fill="#0a7f92">HUB</tspan></text></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ICONS ============ -->
+  <section class="icons">
+    <h3 class="sec">MATCHING ICON SET</h3>
+    <p class="secdesc">Section and UI icons, same 2px stroke and rounded caps as the marks — these ship with whichever logo you pick and replace the current text-only labels.</p>
+    <div class="icon-grid">
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4af0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v9a2 2 0 0 1-2 2"/><path d="M7 9h7M7 12h7M7 15h4"/></svg>
+        <span>NEWS</span>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4af0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 14v6M14 17h6"/></svg>
+        <span>PRODUCTS</span>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4af0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        <span>CONTACT</span>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4af0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 5.3L20 9l-4 4.2 1 5.8-5-2.9-5 2.9 1-5.8L4 9l5.6-.7z"/></svg>
+        <span>HIGHLIGHT</span>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4af0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+        <span>ADMIN</span>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4af0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4L10 14"/><path d="M18 13v6H5V6h6"/></svg>
+        <span>EXT LINK</span>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1.5-.6-2.6-1.4-3.7C15.4 8 16 5 12 3z"/><path d="M9 14a6 6 0 1 0 8 0"/></svg>
+        <span>HACKER NEWS</span>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff4a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.5l5 2.5-5 2.5z" fill="#ff4a4a" stroke="none"/></svg>
+        <span>ALL-IN POD</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MOTION ============ -->
+  <section class="motion">
+    <h3 class="sec">MOTION (INSTEAD OF GIFS)</h3>
+    <p class="secdesc">These are live CSS animations on SVG — sharper than any GIF, ~1KB each, and they pause automatically for visitors with reduced-motion enabled. Any of them can go in your hero or section headers.</p>
+    <div class="motion-grid">
+      <div class="motion-cell">
+        <svg width="120" height="44" viewBox="0 0 120 44"><text x="0" y="30" font-family="Courier New, monospace" font-size="22" font-weight="bold" fill="#4af0ff">&gt;</text><text x="18" y="30" font-family="Courier New, monospace" font-size="16" fill="#e0e8ff">deploy</text><rect class="blink" x="86" y="16" width="10" height="18" fill="#4af0ff"/></svg>
+        <span>BLINKING PROMPT — HERO TAGLINE</span>
+      </div>
+      <div class="motion-cell">
+        <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#1a2a4a" stroke-width="2"/><circle class="spin" cx="30" cy="30" r="24" fill="none" stroke="#4af0ff" stroke-width="2" stroke-dasharray="30 121" stroke-linecap="round"/><circle cx="30" cy="30" r="4" fill="#4af0ff"/></svg>
+        <span>RADAR SWEEP — "LIVE FEED" BADGE</span>
+      </div>
+      <div class="motion-cell">
+        <svg width="60" height="60" viewBox="0 0 60 60"><rect x="8" y="8" width="44" height="44" rx="6" fill="none" stroke="#1a2a4a" stroke-width="2"/><line class="scan" x1="12" y1="30" x2="48" y2="30" stroke="#4af0ff" stroke-width="2" opacity=".8"/><circle class="pulse" cx="30" cy="30" r="10" fill="#4af0ff" opacity=".2"/></svg>
+        <span>SCANNER — SECTION DIVIDER</span>
+      </div>
+      <div class="motion-cell">
+        <svg width="72" height="60" viewBox="0 0 72 60"><circle class="pulse" cx="36" cy="30" r="16" fill="#4af0ff" opacity=".2"/><circle cx="36" cy="30" r="6" fill="#4af0ff"/><g stroke="#4af0ff" stroke-width="1.5" opacity=".5"><line x1="36" y1="30" x2="10" y2="12"/><line x1="36" y1="30" x2="62" y2="12"/><line x1="36" y1="30" x2="10" y2="48"/><line x1="36" y1="30" x2="62" y2="48"/></g><g fill="#0f1628" stroke="#4af0ff" stroke-width="1.5"><rect x="5" y="7" width="10" height="10" rx="2"/><rect x="57" y="7" width="10" height="10" rx="2"/><rect x="5" y="43" width="10" height="10" rx="2"/><rect x="57" y="43" width="10" height="10" rx="2"/></g></svg>
+        <span>PULSING HUB — FOOTER MARK</span>
+      </div>
+    </div>
+  </section>
+
+  <p style="font-size:11px; color:var(--muted); border-top:1px solid var(--border); padding-top:20px;">// Tell Claude a concept number (01 / 02 / 03) and it gets wired into the navbar, hero, favicon and section headers — with or without the animated bits.</p>
+</div>

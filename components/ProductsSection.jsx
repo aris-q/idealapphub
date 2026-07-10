@@ -1,3 +1,5 @@
+import { Icon } from "./Brand";
+
 export default function ProductsSection({ products = [] }) {
   const placeholder = [
     { id: "sample", name: "Coming Soon", description: "Our first product is in the works. Stay tuned!", link: null, image: null },
@@ -5,8 +7,10 @@ export default function ProductsSection({ products = [] }) {
   const items = products.length > 0 ? products : placeholder;
   return (
     <section id="products" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
-      <p style={{ fontSize: 10, letterSpacing: 4, color: "var(--accent)", marginBottom: 8 }}>// PRODUCTS</p>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>Our Products</h2>
+      <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>
+        <Icon name="products" size={20} />
+        Our Products
+      </h2>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
         {items.map((product) => (
           <div key={product.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, overflow: "hidden" }}>

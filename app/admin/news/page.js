@@ -65,11 +65,13 @@ export default function AdminNews() {
     <div style={{ minHeight: "100vh", background: "#0a0e1a", fontFamily: "'Courier New', monospace" }}>
       <nav style={{ background: "#060910", borderBottom: "1px solid #1a2a4a", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ color: "#4af0ff", fontWeight: 700, letterSpacing: 2 }}>IDEALAPPHUB // NEWS</span>
-        <button onClick={() => router.push("/admin/dashboard")} style={{ fontSize: 11, padding: "6px 14px", border: "1px solid #1a2a4a", color: "#7a9cc8", background: "transparent", borderRadius: 4, cursor: "pointer" }}>← BACK</button>
+        <div style={{ display: "flex", gap: 12 }}>
+          <a href="/" style={{ fontSize: 11, padding: "6px 14px", border: "1px solid #1a2a4a", color: "#7a9cc8", borderRadius: 4, textDecoration: "none" }}>GO HOME</a>
+          <button onClick={() => router.push("/admin/dashboard")} style={{ fontSize: 11, padding: "6px 14px", border: "1px solid #1a2a4a", color: "#7a9cc8", background: "transparent", borderRadius: 4, cursor: "pointer" }}>← BACK</button>
+        </div>
       </nav>
       <main style={{ padding: "40px 32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
         <div>
-          <p style={{ fontSize: 10, letterSpacing: 4, color: "#4af0ff", marginBottom: 8 }}>// ADD NEWS</p>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>New Post</h2>
           <form onSubmit={handleSubmit}>
             <input style={inputStyle} placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
@@ -86,7 +88,6 @@ export default function AdminNews() {
           </form>
         </div>
         <div>
-          <p style={{ fontSize: 10, letterSpacing: 4, color: "#4af0ff", marginBottom: 8 }}>// EXISTING</p>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>All Posts</h2>
           {news.length === 0 && <p style={{ fontSize: 12, color: "#7a9cc8" }}>No posts yet.</p>}
           {news.map((item) => (

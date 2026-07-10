@@ -24,3 +24,30 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Brand animations (see components/Brand.jsx) */
+@keyframes brand-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0; }
+}
+@keyframes brand-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.18); }
+}
+@keyframes brand-spin {
+  to { transform: rotate(360deg); }
+}
+.brand-blink { animation: brand-blink 1.1s steps(1) infinite; }
+.brand-pulse {
+  animation: brand-pulse 2.4s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.brand-spin {
+  animation: brand-spin 6s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-blink, .brand-pulse, .brand-spin { animation: none; }
+}

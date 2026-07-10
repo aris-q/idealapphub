@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Icon } from "./Brand";
 export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState(null);
@@ -13,8 +14,10 @@ export default function ContactSection() {
     <section id="contact" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
         <div>
-          <p style={{ fontSize: 10, letterSpacing: 4, color: "var(--accent)", marginBottom: 8 }}>// CONTACT</p>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Get In Touch</h2>
+          <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 12 }}>
+            <Icon name="contact" size={20} />
+            Get In Touch
+          </h2>
           <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.8 }}>Have questions about our products or want to collaborate? Send us a message.</p>
         </div>
         <form onSubmit={handleSubmit}>

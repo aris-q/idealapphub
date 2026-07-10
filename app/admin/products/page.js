@@ -1,18 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
-import { auth, storage, db } from "../../../lib/firebase";
+import { auth, db } from "../../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, addDoc, deleteDoc, doc, orderBy, query } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 
 export default function AdminProducts() {
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ name: "", description: "", link: "", videoUrl: "", image: null });
+  const [form, setForm] = useState({ name: "", description: "", link: "", videoUrl: "", image: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -38,27 +36,15 @@ export default function AdminProducts() {
     setProducts(data);
   };
 
-  const uploadImage = async (file) => {
-    console.log("[STORAGE] Uploading image:", file.name);
-    const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    console.log("[STORAGE] Uploaded URL:", url);
-    return url;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      let imageUrl = null;
-      if (imageFile) imageUrl = await uploadImage(imageFile);
-      const payload = { ...form, image: imageUrl };
+      const payload = { ...form, image: form.image.trim() || null };
       console.log("[PRODUCTS] Saving:", payload);
       const docRef = await addDoc(collection(db, "products"), payload);
       console.log("[PRODUCTS] Saved id:", docRef.id);
-      setForm({ name: "", description: "", link: "", videoUrl: "", image: null });
-      setImageFile(null);
+      setForm({ name: "", description: "", link: "", videoUrl: "", image: "" });
       await fetchProducts();
     } catch (err) {
       console.error("[PRODUCTS] Save error:", err.message);
@@ -89,21 +75,24 @@ export default function AdminProducts() {
     <div style={{ minHeight: "100vh", background: "#0a0e1a", fontFamily: "'Courier New', monospace" }}>
       <nav style={{ background: "#060910", borderBottom: "1px solid #1a2a4a", padding: "14px 32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ color: "#4af0ff", fontWeight: 700, letterSpacing: 2 }}>IDEALAPPHUB // PRODUCTS</span>
-        <button onClick={() => router.push("/admin/dashboard")} style={{ fontSize: 11, padding: "6px 14px", border: "1px solid #1a2a4a", color: "#7a9cc8", background: "transparent", borderRadius: 4, cursor: "pointer" }}>← BACK</button>
+        <div style={{ display: "flex", gap: 12 }}>
+          <a href="/" style={{ fontSize: 11, padding: "6px 14px", border: "1px solid #1a2a4a", color: "#7a9cc8", borderRadius: 4, textDecoration: "none" }}>GO HOME</a>
+          <button onClick={() => router.push("/admin/dashboard")} style={{ fontSize: 11, padding: "6px 14px", border: "1px solid #1a2a4a", color: "#7a9cc8", background: "transparent", borderRadius: 4, cursor: "pointer" }}>← BACK</button>
+        </div>
       </nav>
 
       <main style={{ padding: "40px 32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
         <div>
-          <p style={{ fontSize: 10, letterSpacing: 4, color: "#4af0ff", marginBottom: 8 }}>// ADD PRODUCT</p>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>New Product</h2>
           <form onSubmit={handleSubmit}>
             <input style={inputStyle} placeholder="Product name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
             <textarea style={{ ...inputStyle, height: 80, resize: "none" }} placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
             <input style={inputStyle} placeholder="Product link (https://...)" value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} />
             <input style={inputStyle} placeholder="YouTube video URL (optional)" value={form.videoUrl} onChange={(e) => setForm({ ...form, videoUrl: e.target.value })} />
-            <label style={{ fontSize: 11, color: "#7a9cc8", display: "block", marginBottom: 6 }}>Product Image</label>
-            <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])}
-              style={{ ...inputStyle, padding: "8px 12px", color: "#7a9cc8" }} />
+            <input style={inputStyle} placeholder="Image URL (optional, https://...)" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+            {form.image.trim() && (
+              <img src={form.image} alt="Preview" style={{ width: "100%", height: 100, objectFit: "cover", borderRadius: 4, marginBottom: 12, border: "1px solid #1a2a4a" }} />
+            )}
             <button type="submit" disabled={saving} style={{ width: "100%", padding: "10px 24px", background: "#4af0ff", color: "#060910", fontSize: 12, fontWeight: 700, border: "none", borderRadius: 4, cursor: "pointer", letterSpacing: 1 }}>
               {saving ? "SAVING..." : "ADD PRODUCT"}
             </button>
@@ -111,7 +100,6 @@ export default function AdminProducts() {
         </div>
 
         <div>
-          <p style={{ fontSize: 10, letterSpacing: 4, color: "#4af0ff", marginBottom: 8 }}>// EXISTING</p>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>All Products</h2>
           {products.length === 0 && <p style={{ fontSize: 12, color: "#7a9cc8" }}>No products yet.</p>}
           {products.map((product) => (

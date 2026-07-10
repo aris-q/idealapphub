@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="72" viewBox="0 0 380 72">
+  <g stroke="#4af0ff" stroke-width="2" opacity=".5">
+    <line x1="30" y1="36" x2="30" y2="12"/><line x1="30" y1="36" x2="30" y2="60"/>
+    <line x1="30" y1="36" x2="9" y2="24"/><line x1="30" y1="36" x2="51" y2="24"/>
+    <line x1="30" y1="36" x2="9" y2="48"/><line x1="30" y1="36" x2="51" y2="48"/>
+  </g>
+  <g fill="#0f1628" stroke="#4af0ff" stroke-width="2">
+    <rect x="25" y="7" width="10" height="10" rx="2"/><rect x="25" y="55" width="10" height="10" rx="2"/>
+    <rect x="4" y="19" width="10" height="10" rx="2"/><rect x="46" y="19" width="10" height="10" rx="2"/>
+    <rect x="4" y="43" width="10" height="10" rx="2"/><rect x="46" y="43" width="10" height="10" rx="2"/>
+  </g>
+  <circle cx="30" cy="36" r="7" fill="#4af0ff"/>
+  <text x="76" y="46" font-family="Courier New, monospace" font-size="26" font-weight="bold" letter-spacing="3" fill="#e0e8ff">IDEALAPP<tspan fill="#4af0ff">HUB</tspan></text>
+  <text x="78" y="62" font-family="Courier New, monospace" font-size="9" letter-spacing="5" fill="#7a9cc8">// NEXT-GEN APP PLATFORM</text>
+</svg>
