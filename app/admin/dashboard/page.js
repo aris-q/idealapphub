@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { auth } from "../../../lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { isAdmin } from "../../../lib/admins";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
@@ -11,11 +12,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (u) {
+      if (u && isAdmin(u)) {
         console.log("[AUTH] Admin authenticated:", u.email);
         setUser(u);
       } else {
-        console.log("[AUTH] No session, redirecting to login");
+        console.log("[AUTH] No admin session, redirecting to login");
         router.push("/admin/login");
       }
       setLoading(false);

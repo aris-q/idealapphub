@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { auth, db } from "../../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { isAdmin } from "../../../lib/admins";
 import { collection, getDocs, addDoc, deleteDoc, doc, orderBy, query } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
@@ -15,7 +16,7 @@ export default function AdminNews() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (!u) { router.push("/admin/login"); }
+      if (!u || !isAdmin(u)) { router.push("/admin/login"); }
       else { setUser(u); fetchNews(); }
       setLoading(false);
     });
