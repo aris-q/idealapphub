@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#060910"/>
+  <g fill="none" stroke="#1a2a4a" stroke-width="1" opacity=".5">
+    <path d="M0 90 H640 M0 180 H640 M0 270 H640 M160 0 V360 M320 0 V360 M480 0 V360"/>
+  </g>
+  <rect x="250" y="40" width="140" height="280" rx="22" fill="#0f1628" stroke="#4af0ff" stroke-width="3"/>
+  <rect x="295" y="52" width="50" height="10" rx="5" fill="#1a2a4a"/>
+  <rect x="266" y="76" width="108" height="16" rx="4" fill="#4af0ff" opacity=".9"/>
+  <rect x="266" y="102" width="108" height="42" rx="6" fill="none" stroke="#1a2a4a" stroke-width="2"/>
+  <rect x="272" y="112" width="60" height="8" rx="3" fill="#7a9cc8"/>
+  <rect x="272" y="126" width="40" height="8" rx="3" fill="#3a5080"/>
+  <rect x="266" y="152" width="108" height="42" rx="6" fill="none" stroke="#1a2a4a" stroke-width="2"/>
+  <rect x="272" y="162" width="70" height="8" rx="3" fill="#7a9cc8"/>
+  <rect x="272" y="176" width="34" height="8" rx="3" fill="#3a5080"/>
+  <path d="M266 232 L290 218 L312 226 L338 206 L374 214" fill="none" stroke="#4af0ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="374" cy="214" r="5" fill="#4af0ff"/>
+  <rect x="266" y="252" width="108" height="24" rx="6" fill="#4af0ff"/>
+  <text x="320" y="269" font-family="Courier New, monospace" font-size="12" font-weight="bold" fill="#060910" text-anchor="middle">LOG MEAL</text>
+  <text x="320" y="346" font-family="Courier New, monospace" font-size="15" font-weight="bold" letter-spacing="3" fill="#e0e8ff" text-anchor="middle">NUTRITION <tspan fill="#4af0ff">DEV</tspan></text>
+</svg>

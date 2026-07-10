@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Interactive demo of Nutrition Dev — meal, water, and medication tracking with calorie estimates and peer-to-peer friend sharing.">
+<title>Nutrition Dev — Interactive Demo</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --panel: #ffffff;
+    --panel-2: #eef1f6;
+    --ink: #1b2330;
+    --ink-2: #5b6676;
+    --line: #dde3ec;
+    --blue: #2f6bff;
+    --green: #34b36b;
+    --orange: #e8862a;
+    --purple: #8352c7;
+    --red: #d9483b;
+    --chip-on: #e3f4ea;
+    --chip-on-ink: #1e7d4a;
+    --phone-shell: #10131a;
+    --shadow: 0 18px 50px rgba(27, 35, 48, .14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161d;
+      --panel: #1b212b;
+      --panel-2: #232b38;
+      --ink: #e8ecf3;
+      --ink-2: #97a2b3;
+      --line: #303a49;
+      --blue: #5b8bff;
+      --green: #46c67f;
+      --orange: #f09a45;
+      --purple: #a678e8;
+      --red: #e5695d;
+      --chip-on: #1d3a2b;
+      --chip-on-ink: #6fd9a0;
+      --phone-shell: #05070a;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161d; --panel: #1b212b; --panel-2: #232b38; --ink: #e8ecf3;
+    --ink-2: #97a2b3; --line: #303a49; --blue: #5b8bff; --green: #46c67f;
+    --orange: #f09a45; --purple: #a678e8; --red: #e5695d;
+    --chip-on: #1d3a2b; --chip-on-ink: #6fd9a0; --phone-shell: #05070a;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .5);
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f6f9; --panel: #ffffff; --panel-2: #eef1f6; --ink: #1b2330;
+    --ink-2: #5b6676; --line: #dde3ec; --blue: #2f6bff; --green: #34b36b;
+    --orange: #e8862a; --purple: #8352c7; --red: #d9483b;
+    --chip-on: #e3f4ea; --chip-on-ink: #1e7d4a; --phone-shell: #10131a;
+    --shadow: 0 18px 50px rgba(27, 35, 48, .14);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.45;
+  }
+  .wrap {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: flex;
+    gap: 36px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- Notes rail ---------- */
+  .rail { flex: 1 1 320px; max-width: 420px; position: sticky; top: 24px; }
+  .rail h1 { font-size: 1.45rem; margin: 0 0 4px; letter-spacing: -.01em; text-wrap: balance; }
+  .rail .sub { color: var(--ink-2); font-size: .92rem; margin: 0 0 18px; }
+  .eyebrow {
+    font-size: .68rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-2); margin: 18px 0 8px;
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .card h3 { margin: 0 0 4px; font-size: .95rem; }
+  .card p { margin: 0; font-size: .84rem; color: var(--ink-2); }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
+  .controls button, .controls select {
+    font: inherit; font-size: .82rem; font-weight: 600;
+    padding: 8px 13px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  }
+  .controls button:hover { border-color: var(--blue); color: var(--blue); }
+  .controls button:focus-visible, .controls select:focus-visible,
+  .phone button:focus-visible, .phone input:focus-visible {
+    outline: 2px solid var(--blue); outline-offset: 2px;
+  }
+  .footnote { font-size: .76rem; color: var(--ink-2); margin-top: 16px; }
+
+  /* ---------- Phone ---------- */
+  .phone-col { flex: 0 0 auto; }
+  .phone {
+    width: 390px; height: 780px; background: var(--phone-shell);
+    border-radius: 46px; padding: 12px; box-shadow: var(--shadow);
+    position: relative;
+  }
+  .screen {
+    background: var(--bg); border-radius: 36px; height: 100%;
+    overflow: hidden; display: flex; flex-direction: column; position: relative;
+  }
+  .notch {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 28px; background: var(--phone-shell);
+    border-radius: 16px; z-index: 40;
+  }
+  .statusbar {
+    flex: 0 0 auto; height: 44px; display: flex; align-items: flex-end;
+    justify-content: space-between; padding: 0 26px 4px;
+    font-size: .78rem; font-weight: 600;
+  }
+  .content { flex: 1 1 auto; overflow-y: auto; padding: 10px 16px 18px; }
+  .content::-webkit-scrollbar { width: 0; }
+
+  /* tab bar */
+  .tabbar {
+    flex: 0 0 auto; display: flex; border-top: 1px solid var(--line);
+    background: var(--panel); padding: 6px 4px 14px;
+  }
+  .tabbar button {
+    flex: 1; background: none; border: none; cursor: pointer;
+    color: var(--ink-2); font-size: .62rem; font-weight: 600;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 4px 0; font-family: inherit;
+  }
+  .tabbar button .glyph { font-size: 1.15rem; line-height: 1; }
+  .tabbar button.on { color: var(--blue); }
+
+  /* shared in-phone pieces */
+  .navtitle { font-size: 1.5rem; font-weight: 800; margin: 8px 2px 12px; letter-spacing: -.01em; }
+  .pcard {
+    background: var(--panel); border-radius: 16px; padding: 14px;
+    margin-bottom: 12px; border: 1px solid var(--line);
+  }
+  .pcard h4 { margin: 0 0 8px; font-size: .92rem; display: flex; align-items: center; gap: 7px; }
+  .muted { color: var(--ink-2); font-size: .74rem; }
+  .btn {
+    display: block; width: 100%; text-align: center; font-family: inherit;
+    font-size: .95rem; font-weight: 700; color: #fff; border: none;
+    background: linear-gradient(90deg, var(--blue), var(--green));
+    padding: 14px; border-radius: 14px; cursor: pointer;
+  }
+  .btn.secondary { background: var(--panel-2); color: var(--ink); font-weight: 600; }
+  .btn.orange { background: var(--orange); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* meal chips */
+  .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .chip {
+    font-family: inherit; font-size: .68rem; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--line); background: var(--panel-2); color: var(--ink-2);
+    border-radius: 10px; padding: 8px 2px; display: flex; flex-direction: column;
+    align-items: center; gap: 2px;
+  }
+  .chip .glyph { font-size: .95rem; }
+  .chip.on { background: var(--chip-on); color: var(--chip-on-ink); border-color: var(--chip-on-ink); }
+
+  .calrow { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .calrow input {
+    width: 74px; font: inherit; font-size: .85rem; padding: 6px 8px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--panel-2); color: var(--ink);
+  }
+  .est-tag {
+    font-size: .62rem; font-weight: 700; color: var(--orange);
+    background: color-mix(in srgb, var(--orange) 14%, transparent);
+    padding: 2px 6px; border-radius: 5px;
+  }
+  .linkbtn {
+    font-family: inherit; font-size: .72rem; font-weight: 600; cursor: pointer;
+    color: var(--blue); background: color-mix(in srgb, var(--blue) 10%, transparent);
+    border: none; border-radius: 7px; padding: 6px 10px; margin-left: auto;
+  }
+
+  /* water blocks */
+  .waterblocks { display: flex; gap: 4px; margin: 8px 0; }
+  .waterblocks span { flex: 1; height: 8px; border-radius: 4px; background: var(--line); }
+  .waterblocks span.fill { background: var(--blue); }
+  .stepper { display: flex; gap: 14px; align-items: center; }
+  .stepper button {
+    width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+    font-size: 1.1rem; font-weight: 700; color: #fff; background: var(--blue);
+    font-family: inherit; line-height: 1;
+  }
+  .stepper button.minus { background: var(--red); }
+  .stepper button:disabled { opacity: .35; cursor: default; }
+
+  /* rankings */
+  .rankrow {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+    border-radius: 12px; margin-bottom: 6px; background: var(--panel-2);
+  }
+  .rankrow.me { background: color-mix(in srgb, var(--blue) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--blue) 35%, transparent); }
+  .rankbadge {
+    width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto;
+    display: grid; place-items: center; font-size: .8rem; font-weight: 800;
+    color: #fff; background: var(--ink-2);
+  }
+  .rankbadge.r1 { background: #d4a017; } .rankbadge.r2 { background: #8b96a5; } .rankbadge.r3 { background: #b06b34; }
+  .rankrow .who { flex: 1; min-width: 0; }
+  .rankrow .who .nm { font-size: .84rem; font-weight: 700; display: flex; gap: 6px; align-items: center; }
+  .tag {
+    font-size: .58rem; font-weight: 800; padding: 2px 6px; border-radius: 5px; color: #fff;
+  }
+  .tag.you { background: var(--blue); } .tag.friend { background: var(--purple); }
+  .rankrow .st { font-size: .68rem; color: var(--ink-2); }
+  .rankrow .sc { font-weight: 800; font-size: .95rem; }
+
+  /* ring */
+  .ringwrap { display: flex; align-items: center; gap: 16px; }
+  .ringwrap svg { flex: 0 0 auto; }
+  .barrow { display: flex; align-items: center; gap: 8px; font-size: .74rem; margin-bottom: 6px; }
+  .barrow .lbl { width: 52px; color: var(--ink-2); }
+  .barrow .track { flex: 1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .barrow .fillb { height: 100%; border-radius: 4px; background: var(--green); }
+  .barrow .pct { width: 36px; text-align: right; font-weight: 700; }
+
+  /* sheets & overlays inside phone */
+  .sheet {
+    position: absolute; inset: 0; z-index: 50; display: flex; align-items: flex-end;
+    background: rgba(10, 14, 20, .45); border-radius: 36px;
+  }
+  .sheet .panel {
+    background: var(--bg); width: 100%; max-height: 88%; overflow-y: auto;
+    border-radius: 26px 26px 36px 36px; padding: 18px 16px 26px;
+  }
+  .sheet h3 { margin: 2px 0 12px; font-size: 1.05rem; text-align: center; }
+  .slider-row { margin-bottom: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .slider-row .top { display: flex; justify-content: space-between; font-size: .8rem; font-weight: 600; }
+  .slider-row .ex { font-size: .66rem; color: var(--ink-2); }
+  .slider-row input[type=range] { width: 100%; accent-color: var(--blue); }
+  .totalbox {
+    display: flex; justify-content: space-between; align-items: center;
+    background: color-mix(in srgb, var(--orange) 12%, transparent);
+    border-radius: 12px; padding: 12px 14px; margin: 6px 0 12px;
+    font-weight: 700;
+  }
+  .totalbox .kcal { color: var(--orange); font-size: 1.15rem; }
+  .disclaimer {
+    font-size: .68rem; color: var(--ink-2); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 12px;
+  }
+
+  /* paywall */
+  .heroTitle {
+    font-size: 1.8rem; font-weight: 800; text-align: center; margin: 14px 0 8px;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -.01em; text-wrap: balance;
+  }
+  .badge {
+    display: inline-flex; gap: 6px; align-items: center; font-size: .64rem; font-weight: 800;
+    letter-spacing: .08em; color: var(--orange);
+    background: color-mix(in srgb, var(--orange) 14%, transparent);
+    border-radius: 999px; padding: 6px 14px;
+  }
+  .feature { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+  .feature .ic {
+    width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
+    font-size: .9rem; flex: 0 0 auto; background: var(--panel-2);
+  }
+  .feature b { font-size: .82rem; display: block; }
+  .feature span { font-size: .72rem; color: var(--ink-2); }
+
+  .banner {
+    display: flex; gap: 10px; align-items: center; font-size: .74rem;
+    background: color-mix(in srgb, var(--orange) 13%, transparent);
+    padding: 9px 14px;
+  }
+  .banner b { display: block; font-size: .78rem; }
+  .banner button {
+    margin-left: auto; font-family: inherit; font-size: .68rem; font-weight: 700;
+    color: #fff; border: none; border-radius: 999px; padding: 6px 12px; cursor: pointer;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+  }
+
+  /* onboarding */
+  .dots { display: flex; gap: 6px; margin: 10px 0 16px; }
+  .dots span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+  .dots span.on { background: var(--green); }
+  .obTitle { font-size: 1.3rem; font-weight: 800; margin: 6px 0 4px; }
+  .dietopt {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    font-family: inherit; font-size: .88rem; font-weight: 600; color: var(--ink);
+    background: var(--panel); border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
+  }
+  .dietopt.on { border-color: var(--green); background: var(--chip-on); color: var(--chip-on-ink); }
+  .nameinput {
+    width: 100%; font: inherit; font-size: 1rem; padding: 12px;
+    border: 1.5px solid var(--line); border-radius: 12px;
+    background: var(--panel); color: var(--ink); margin: 8px 0 4px;
+  }
+
+  /* friends */
+  .codebox {
+    font-size: 1.6rem; font-weight: 800; letter-spacing: .18em; color: var(--blue);
+    background: color-mix(in srgb, var(--blue) 10%, transparent);
+    border-radius: 12px; padding: 10px 16px; text-align: center; margin: 8px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .filechip {
+    font-size: .7rem; font-weight: 600; background: var(--panel-2);
+    border: 1px dashed var(--ink-2); border-radius: 10px; padding: 8px 10px;
+    margin-top: 8px; word-break: break-all; color: var(--ink-2);
+  }
+  pre.json {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .62rem; background: var(--panel-2); border-radius: 10px;
+    padding: 10px; overflow-x: auto; margin: 8px 0; color: var(--ink);
+  }
+
+  .toast {
+    position: absolute; left: 50%; transform: translateX(-50%); bottom: 92px;
+    background: var(--ink); color: var(--bg); font-size: .74rem; font-weight: 600;
+    padding: 9px 16px; border-radius: 999px; z-index: 60; opacity: 0;
+    transition: opacity .25s; pointer-events: none; max-width: 84%; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+  @media (max-width: 860px) {
+    .rail { position: static; max-width: 640px; }
+    .wrap { flex-direction: column-reverse; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="phone-col">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen" id="screen"></div>
+    </div>
+  </div>
+
+  <div class="rail">
+    <h1>Nutrition Dev — interactive demo</h1>
+    <p class="sub">A clickable mock of the Dev version: no accounts, no server, free first year from the App Store, peer-to-peer friends, and calorie estimates.</p>
+
+    <div class="eyebrow">Demo controls</div>
+    <div class="controls">
+      <button id="ctl-reset">Reset demo</button>
+      <select id="ctl-stage" aria-label="Free-year stage">
+        <option value="new">New user (paywall)</option>
+        <option value="mid">Mid free year (200 days left)</option>
+        <option value="ending">Free year ending (5 days left)</option>
+        <option value="lapsed">Lapsed (paywall, no intro offer)</option>
+      </select>
+    </div>
+
+    <div class="eyebrow">What to try</div>
+    <div class="card"><h3>1 · Start the free year</h3><p>The paywall is a $0 App Store purchase — the intro offer gives 12 months free, then $2.99/yr. Switch the stage selector to see the lapsed-user wording.</p></div>
+    <div class="card"><h3>2 · Log a meal with calories</h3><p>On Today, toggle food groups, then type calories or tap <b>Estimate</b> to compute a rough value from food weights. Estimates are always labeled and disclaimed.</p></div>
+    <div class="card"><h3>3 · Import a friend</h3><p>On Friends, tap <b>Simulate: receive Alex's file</b> — that's the peer-to-peer JSON a friend AirDrops you. Alex then appears in Rankings with real stats.</p></div>
+
+    <p class="footnote">Demo only — condensed to 5 tabs (the app has 7). All figures shown are estimates; the app is a tracking helper, not medical or nutrition advice.</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const PER100 = { protein: 165, carbs: 130, veggies: 35, fat: 600 };
+  const CATS = [
+    { k: 'protein', name: 'Protein', glyph: '🍗', ex: 'chicken, fish, eggs, tofu' },
+    { k: 'carbs',   name: 'Carbs',   glyph: '🍚', ex: 'rice, pasta, bread, potato' },
+    { k: 'veggies', name: 'Veggies', glyph: '🥦', ex: 'salad, broccoli, carrots' },
+    { k: 'fat',     name: 'Fats',    glyph: '🥑', ex: 'oil, butter, nuts, avocado' },
+  ];
+  const BOTS = [
+    { name: 'Emma Wilson', score: 84, streak: 12, bal: 78 },
+    { name: 'Liam Garcia', score: 71, streak: 6,  bal: 64 },
+    { name: 'Sophia Lee',  score: 63, streak: 4,  bal: 58 },
+    { name: 'Noah Brown',  score: 48, streak: 2,  bal: 41 },
+  ];
+  const FRIEND_FILES = [
+    { id: 'f-alex', name: 'Alex', code: '482913', score: 76, streak: 9, bal: 71, meals: 112, days: 6 },
+    { id: 'f-jordan', name: 'Jordan', code: '105774', score: 58, streak: 3, bal: 52, meals: 64, days: 4 },
+  ];
+
+  const fresh = () => ({
+    stage: 'new',           // new | mid | ending | lapsed
+    subscribed: false,
+    view: 'paywall',        // paywall | purchase | onboarding | app
+    obStep: 0,
+    name: '',
+    diet: 'Omnivore',
+    tab: 'today',
+    water: 3,
+    meals: [
+      { type: 'Breakfast', glyph: '🌅', protein: true, carbs: true, veggies: false, fat: true, cal: 420, est: false },
+      { type: 'Lunch', glyph: '☀️', protein: false, carbs: false, veggies: false, fat: false, cal: null, est: false },
+      { type: 'Dinner', glyph: '🌙', protein: false, carbs: false, veggies: false, fat: false, cal: null, est: false },
+    ],
+    friends: [],
+    estFor: null,           // meal index for estimator sheet
+    estGrams: { protein: 0, carbs: 0, veggies: 0, fat: 0 },
+    shareOpen: false,
+  });
+  let S = fresh();
+
+  const $ = sel => document.querySelector(sel);
+  const screen = $('#screen');
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const myName = () => S.name.trim() || 'Me';
+  const myCode = () => {
+    let h = 0; const src = 'demo-' + myName();
+    for (const ch of src) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return String(h % 1000000).padStart(6, '0');
+  };
+  const balancedCount = () => S.meals.filter(m => m.protein && m.carbs && m.veggies && m.fat).length;
+  const totalCal = () => S.meals.reduce((t, m) => t + (m.cal || 0), 0);
+  const myScore = () => {
+    const bal = balancedCount() / S.meals.length;
+    const water = Math.min(S.water / 8, 1);
+    return Math.round(bal * 55 + water * 30 + 15);
+  };
+  const estTotal = () => Math.round(CATS.reduce((t, c) => t + PER100[c.k] * S.estGrams[c.k] / 100, 0));
+  const daysLeft = () => S.stage === 'mid' ? 200 : S.stage === 'ending' ? 5 : null;
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast'); if (!t) return;
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  /* ---------- screens ---------- */
+
+  const statusbar = () => `<div class="statusbar"><span>9:41</span><span>▮▮▮ 📶 🔋</span></div>`;
+
+  function paywall() {
+    const eligible = S.stage !== 'lapsed';
+    return `${statusbar()}
+    <div class="content">
+      <div style="text-align:center;margin-top:14px"><span class="badge">👑 PREMIUM</span></div>
+      <div class="heroTitle">${eligible ? 'Start Your<br>Free Year' : 'Keep Your<br>Streak Going'}</div>
+      <p class="muted" style="text-align:center;font-size:.8rem;margin:0 14px 16px">
+        ${eligible
+          ? 'Try everything free for a full year — then it’s just $2.99/year. Cancel anytime.'
+          : 'Subscribe to keep logging meals, water, and medications.'}</p>
+
+      <div class="pcard">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><b style="font-size:.9rem">Premium Annual</b><br>
+            <span class="muted">${eligible ? 'Free for 1 year, then $2.99/year' : '$2.99/year'}</span></div>
+          <span style="color:var(--green);font-weight:800">✓</span>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="feature"><div class="ic">🥗</div><div><b>Balanced diet tracking</b><span>Meals, water, and medication in one place</span></div></div>
+        <div class="feature"><div class="ic">⚡</div><div><b>Calorie estimates</b><span>Enter a number or estimate from food weight</span></div></div>
+        <div class="feature"><div class="ic">🤝</div><div><b>Friends, no accounts</b><span>Share progress device-to-device</span></div></div>
+        <div class="feature" style="margin-bottom:0"><div class="ic">🔒</div><div><b>Private by design</b><span>No login — everything stays on your device</span></div></div>
+      </div>
+
+      <div class="disclaimer">ℹ️ A tracking helper. Nutrition and calorie figures are estimates only and not guaranteed. Not medical or nutrition advice.</div>
+
+      <button class="btn" id="pay-cta">👑 ${eligible ? 'Start My Free Year' : 'Subscribe'} →</button>
+      <p class="muted" style="text-align:center;margin:8px 0 0">${eligible ? 'Free for 1 year, then $2.99/year' : '$2.99 per year'} · Cancel anytime</p>
+    </div>`;
+  }
+
+  function purchaseSheet() {
+    const eligible = S.stage !== 'lapsed';
+    return `<div class="sheet"><div class="panel">
+      <h3> App Store</h3>
+      <div class="pcard">
+        <b style="font-size:.9rem">Nutrition Dev — Premium Annual</b><br>
+        <span class="muted">Account: you@icloud.com</span>
+        <hr style="border:none;border-top:1px solid var(--line);margin:10px 0">
+        <div style="display:flex;justify-content:space-between;font-size:.85rem"><span>Due today</span><b class="num">${eligible ? '$0.00' : '$2.99'}</b></div>
+        ${eligible ? `<div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--ink-2);margin-top:4px"><span>From next year</span><span class="num">$2.99/year</span></div>` : ''}
+      </div>
+      <button class="btn" id="pay-confirm">Confirm with Face ID</button>
+      <button class="btn secondary" id="pay-cancel" style="margin-top:8px">Cancel</button>
+    </div></div>`;
+  }
+
+  function onboarding() {
+    const steps = ['welcome', 'diet', 'water'];
+    const step = steps[S.obStep];
+    let body = '';
+    if (step === 'welcome') {
+      body = `
+        <div style="text-align:center;font-size:3rem;margin:26px 0 6px">💚</div>
+        <div class="obTitle" style="text-align:center">Welcome!</div>
+        <p class="muted" style="text-align:center;margin:0 10px 18px;font-size:.8rem">Track meals, water, and medication — all on your device. What should friends call you?</p>
+        <input class="nameinput" id="ob-name" placeholder="Your name (optional)" value="${esc(S.name)}" maxlength="20">
+        <p class="muted">Used only on shared progress files and rankings.</p>`;
+    } else if (step === 'diet') {
+      body = `
+        <div class="obTitle">Your diet type</div>
+        <p class="muted" style="margin:0 0 12px">Pick what fits best — you can change it later.</p>
+        ${['Omnivore', 'Vegetarian', 'Vegan', 'Pescatarian'].map(d =>
+          `<button class="dietopt ${S.diet === d ? 'on' : ''}" data-diet="${d}">${d === S.diet ? '✓ ' : ''}${d}</button>`).join('')}`;
+    } else {
+      body = `
+        <div class="obTitle">Daily water goal</div>
+        <p class="muted" style="margin:0 0 16px">How many glasses per day?</p>
+        <div style="text-align:center;font-size:2.6rem;font-weight:800;color:var(--blue)" class="num">8 <span style="font-size:1rem;color:var(--ink-2);font-weight:600">glasses</span></div>
+        <div class="waterblocks" style="margin:16px 0">${Array.from({length:8},()=>'<span class="fill"></span>').join('')}</div>
+        <div class="disclaimer">ℹ️ Goals and estimates are general helpers, not guarantees or medical advice.</div>`;
+    }
+    return `${statusbar()}
+    <div class="content">
+      <div class="dots">${steps.map((_, i) => `<span class="${i <= S.obStep ? 'on' : ''}"></span>`).join('')}</div>
+      ${body}
+    </div>
+    <div style="padding:0 16px 22px;display:flex;gap:10px">
+      ${S.obStep > 0 ? '<button class="btn secondary" id="ob-back" style="flex:1">Back</button>' : ''}
+      <button class="btn" id="ob-next" style="flex:2">${S.obStep === 2 ? 'Get Started' : 'Next'}</button>
+    </div>`;
+  }
+
+  /* ----- main app tabs ----- */
+
+  function trialBanner() {
+    const d = daysLeft();
+    if (!S.subscribed || d === null || d > 30) return '';
+    return `<div class="banner">⚠️<div><b>${d} days left in your free year</b>Your subscription renews automatically</div><button id="banner-details">Details</button></div>`;
+  }
+
+  function todayTab() {
+    const total = totalCal();
+    return `
+    <div class="navtitle">Today <span class="muted" style="font-size:.78rem;font-weight:500">Fri, Jul 10</span></div>
+
+    <div class="pcard">
+      <h4>💧 Water Intake <span class="muted" style="margin-left:auto" ><span class="num">${S.water}</span> / 8 glasses</span></h4>
+      <div class="waterblocks">${Array.from({ length: 8 }, (_, i) => `<span class="${i < S.water ? 'fill' : ''}"></span>`).join('')}</div>
+      <div class="stepper" style="justify-content:center;margin-top:8px">
+        <button class="minus" id="water-minus" ${S.water === 0 ? 'disabled' : ''} aria-label="Remove a glass">−</button>
+        <button id="water-plus" ${S.water >= 12 ? 'disabled' : ''} aria-label="Add a glass">+</button>
+      </div>
+    </div>
+
+    <div class="pcard" style="background:color-mix(in srgb, var(--orange) 8%, var(--panel))">
+      <h4>⚡ Calories Today
+        <span style="margin-left:auto;font-weight:800;color:var(--orange)" class="num">${total > 0 ? '~' + total + ' kcal' : '<span class="muted">not logged</span>'}</span></h4>
+      <div class="muted">Estimates only — not guaranteed.</div>
+    </div>
+
+    ${S.meals.map((m, i) => `
+    <div class="pcard">
+      <h4>${m.glyph} ${m.type}</h4>
+      <div class="chips">
+        ${CATS.map(c => `<button class="chip ${m[c.k] ? 'on' : ''}" data-meal="${i}" data-cat="${c.k}">
+          <span class="glyph">${c.glyph}</span>${c.name}</button>`).join('')}
+      </div>
+      <div class="calrow">
+        <span style="color:var(--orange)">⚡</span>
+        <input inputmode="numeric" placeholder="kcal" data-calinput="${i}" value="${m.cal ?? ''}" aria-label="${m.type} calories">
+        <span class="muted">kcal</span>
+        ${m.est ? '<span class="est-tag">est.</span>' : ''}
+        <button class="linkbtn" data-estimate="${i}">⚖️ Estimate</button>
+      </div>
+      <div class="muted" style="margin-top:5px">Estimate only — not guaranteed</div>
+    </div>`).join('')}`;
+  }
+
+  function ring(pct, color, size = 92) {
+    const r = 38, c = 2 * Math.PI * r;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 92 92" role="img" aria-label="${pct} percent">
+      <circle cx="46" cy="46" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/>
+      <circle cx="46" cy="46" r="${r}" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round"
+        stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}" transform="rotate(-90 46 46)"/>
+      <text x="46" y="52" text-anchor="middle" font-size="19" font-weight="800" fill="var(--ink)">${pct}%</text>
+    </svg>`;
+  }
+
+  function weeklyTab() {
+    const bal = Math.round(balancedCount() / S.meals.length * 100);
+    const rates = CATS.map(c => ({
+      name: c.name,
+      pct: Math.round(S.meals.filter(m => m[c.k]).length / S.meals.length * 100)
+    }));
+    const cal = totalCal();
+    return `
+    <div class="navtitle">Weekly Summary</div>
+    <div class="pcard"><h4>Balanced meals</h4>
+      <div class="ringwrap">${ring(bal, 'var(--green)')}
+        <div class="muted" style="font-size:.78rem">${bal >= 66 ? 'Great balance — keep it up!' : bal > 0 ? 'Getting there — try to hit all four groups.' : 'Log today’s meals to see your balance.'}<br><br><i>Demo shows today's data as the week.</i></div>
+      </div>
+    </div>
+    <div class="pcard"><h4>Food groups</h4>
+      ${rates.map(r => `<div class="barrow"><span class="lbl">${r.name}</span><span class="track"><span class="fillb" style="width:${r.pct}%"></span></span><span class="pct num">${r.pct}%</span></div>`).join('')}
+    </div>
+    <div class="pcard"><h4>⚡ Calories</h4>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="muted">Average per logged day</span>
+        <b style="color:var(--orange)" class="num">${cal > 0 ? '~' + cal + ' kcal' : '—'}</b>
+      </div>
+      <div class="muted" style="margin-top:5px">Average of days with logged calories. Estimates only — not guaranteed.</div>
+    </div>`;
+  }
+
+  function rankingsTab() {
+    const rows = [
+      { name: myName(), score: myScore(), streak: 1, bal: Math.round(balancedCount() / 3 * 100), me: true },
+      ...S.friends.map(f => ({ name: f.name, score: f.score, streak: f.streak, bal: f.bal, friend: true })),
+      ...BOTS,
+    ].sort((a, b) => b.score - a.score);
+    const myRank = rows.findIndex(r => r.me) + 1;
+    return `
+    <div class="navtitle">Bronze League 🏆</div>
+    ${myRank <= 3 ? `<div class="pcard" style="text-align:center;background:color-mix(in srgb,#d4a017 12%, var(--panel))"><b>🙌 TOP ${myRank}!</b><div class="muted">${myRank === 1 ? 'You’re #1 — incredible!' : 'Keep pushing to reach #1!'}</div></div>` : ''}
+    <div class="pcard">
+      <h4>Rankings <span class="muted" style="margin-left:auto">${rows.length} players</span></h4>
+      ${rows.map((r, i) => `
+      <div class="rankrow ${r.me ? 'me' : ''}">
+        <div class="rankbadge ${i < 3 ? 'r' + (i + 1) : ''}">${i < 3 ? '🏆' : i + 1}</div>
+        <div class="who">
+          <div class="nm">${esc(r.name)} ${r.me ? '<span class="tag you">YOU</span>' : ''}${r.friend ? '<span class="tag friend">FRIEND</span>' : ''}</div>
+          <div class="st">🔥 ${r.streak} streak · ✅ <span class="num">${r.bal}%</span> balanced</div>
+        </div>
+        <div class="sc num">${r.score}</div>
+      </div>`).join('')}
+      ${S.friends.length === 0 ? '<div class="muted" style="margin-top:6px">Import a friend’s progress file (Friends tab) to rank against real people.</div>' : ''}
+    </div>`;
+  }
+
+  function friendsTab() {
+    const nextFile = FRIEND_FILES.find(f => !S.friends.some(x => x.id === f.id));
+    return `
+    <div class="navtitle">Friends</div>
+    <div class="pcard" style="background:color-mix(in srgb, var(--blue) 6%, var(--panel))">
+      <h4>↔️ Friends, without accounts</h4>
+      <div class="muted">Progress moves directly between devices as a small file — AirDrop, Messages, or email. Nothing is uploaded to a server.</div>
+    </div>
+
+    <div class="pcard">
+      <h4>📤 Share My Progress</h4>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div><b>${esc(myName())}</b><br><span class="muted">Code <span class="num">${myCode()}</span></span></div>
+        <button class="linkbtn" id="share-btn" style="background:var(--green);color:#fff;padding:8px 14px">Share</button>
+      </div>
+      <div class="muted" style="margin-top:6px">Sends a snapshot of your weekly stats.</div>
+    </div>
+
+    <div class="pcard">
+      <h4>📥 Add / Update a Friend</h4>
+      <button class="btn" id="import-btn" ${nextFile ? '' : 'disabled'}>
+        ${nextFile ? `Simulate: receive ${nextFile.name}’s file` : 'All demo friends imported'}</button>
+      <div class="muted" style="margin-top:6px">In the real app this opens the file picker for a file a friend sent you.</div>
+    </div>
+
+    ${S.friends.length ? `<div class="pcard"><h4>👥 Your Friends <span class="muted" style="margin-left:auto">${S.friends.length}</span></h4>
+      ${S.friends.map(f => `<div class="rankrow">
+        <div class="rankbadge" style="background:var(--purple)">${f.name[0]}</div>
+        <div class="who"><div class="nm">${f.name}</div>
+        <div class="st">⭐ <span class="num">${f.score}</span> · 🔥 ${f.streak} · updated today</div></div>
+        <button class="linkbtn" data-unfriend="${f.id}" style="color:var(--red);background:color-mix(in srgb,var(--red) 10%, transparent)">Remove</button>
+      </div>`).join('')}</div>` : ''}`;
+  }
+
+  function settingsTab() {
+    return `
+    <div class="navtitle">Settings</div>
+    <div class="pcard">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="rankbadge" style="width:52px;height:52px;font-size:1.3rem;background:var(--blue)">${esc(myName()[0].toUpperCase())}</div>
+        <div style="flex:1">
+          <input class="nameinput" id="set-name" style="margin:0;padding:8px 10px;font-size:.9rem" value="${esc(S.name)}" placeholder="Your name" maxlength="20">
+          <div class="muted" style="margin-top:4px">Friend code <b class="num">${myCode()}</b> · shown when you share progress</div>
+        </div>
+      </div>
+    </div>
+    <div class="pcard">
+      <h4>👑 ${S.stage === 'mid' || S.stage === 'ending' ? 'Free year active' : 'Premium active'}</h4>
+      <div class="muted">${daysLeft() !== null ? `<span class="num">${daysLeft()}</span> days left, then renews at $2.99/year. Manage in App Store settings.` : 'Thanks for your support! Manage in App Store settings.'}</div>
+    </div>
+    <div class="pcard"><h4>🥗 Diet type</h4><div class="muted">${S.diet} · set during onboarding</div></div>
+    <div class="pcard"><h4>🔔 Meal reminders</h4><div class="muted">Breakfast 7:00 · Lunch 12:00 · Dinner 19:00</div></div>
+    <p class="muted" style="text-align:center;margin:14px 8px">All data stays on this device. No account, no server.<br>Nutrition figures are estimates only — a tracking helper, not medical advice.</p>`;
+  }
+
+  function estimatorSheet() {
+    return `<div class="sheet"><div class="panel">
+      <h3>⚖️ Estimate Calories</h3>
+      <p class="muted" style="text-align:center;margin:-6px 0 12px">About how many grams of each type of food?</p>
+      ${CATS.map(c => `
+      <div class="slider-row">
+        <div class="top"><span>${c.glyph} ${c.name}</span><span class="num">${S.estGrams[c.k]} g</span></div>
+        <div class="ex">${c.ex}</div>
+        <input type="range" min="0" max="500" step="10" value="${S.estGrams[c.k]}" data-gram="${c.k}" aria-label="${c.name} grams">
+      </div>`).join('')}
+      <div class="totalbox"><span>⚡ Estimated total</span><span class="kcal num">~${estTotal()} kcal</span></div>
+      <div class="disclaimer">Estimates only. Calorie values are rough averages by food type and are not guaranteed to be accurate. Not medical or nutrition advice.</div>
+      <button class="btn orange" id="est-use" ${estTotal() === 0 ? 'disabled' : ''}>Use Estimate (~${estTotal()} kcal)</button>
+      <button class="btn secondary" id="est-cancel" style="margin-top:8px">Cancel</button>
+    </div></div>`;
+  }
+
+  function shareSheet() {
+    const p = { version: 1, id: 'me-demo', name: myName(), friendCode: myCode(), generatedAt: new Date().toISOString().slice(0, 10), weeklyScore: myScore(), currentStreak: 1, balancedMealsPercentage: +(balancedCount() / 3).toFixed(2), activeDaysThisWeek: 1 };
+    return `<div class="sheet"><div class="panel">
+      <h3>Share progress file</h3>
+      <div class="filechip">📄 Progress_${esc(myName().replace(/ /g, '_'))}_${myCode()}.json</div>
+      <pre class="json">${esc(JSON.stringify(p, null, 2))}</pre>
+      <div style="display:flex;gap:14px;justify-content:center;font-size:.66rem;text-align:center;color:var(--ink-2);margin-bottom:14px">
+        <span>📡<br>AirDrop</span><span>💬<br>Messages</span><span>✉️<br>Mail</span><span>📁<br>Files</span>
+      </div>
+      <button class="btn secondary" id="share-close">Done</button>
+    </div></div>`;
+  }
+
+  const TABS = [
+    { k: 'today', label: 'Today', glyph: '📋' },
+    { k: 'weekly', label: 'Weekly', glyph: '📊' },
+    { k: 'rankings', label: 'Rankings', glyph: '🏆' },
+    { k: 'friends', label: 'Friends', glyph: '👥' },
+    { k: 'settings', label: 'Settings', glyph: '⚙️' },
+  ];
+
+  function appShell() {
+    const bodies = { today: todayTab, weekly: weeklyTab, rankings: rankingsTab, friends: friendsTab, settings: settingsTab };
+    return `${statusbar()}
+    ${trialBanner()}
+    <div class="content">${bodies[S.tab]()}</div>
+    <div class="tabbar">
+      ${TABS.map(t => `<button class="${S.tab === t.k ? 'on' : ''}" data-tab="${t.k}"><span class="glyph">${t.glyph}</span>${t.label}</button>`).join('')}
+    </div>
+    ${S.estFor !== null ? estimatorSheet() : ''}
+    ${S.shareOpen ? shareSheet() : ''}`;
+  }
+
+  /* ---------- render + events ---------- */
+
+  function render() {
+    let html;
+    if (S.view === 'paywall') html = paywall();
+    else if (S.view === 'purchase') html = paywall() + purchaseSheet();
+    else if (S.view === 'onboarding') html = onboarding();
+    else html = appShell();
+    screen.innerHTML = html + '<div class="toast" id="toast"></div>';
+  }
+
+  screen.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.id === 'pay-cta') { S.view = 'purchase'; render(); }
+    else if (b.id === 'pay-cancel') { S.view = 'paywall'; render(); }
+    else if (b.id === 'pay-confirm') {
+      S.subscribed = true;
+      if (S.stage === 'new') S.stage = 'mid';
+      S.view = 'onboarding';
+      render(); toast(S.stage === 'lapsed' ? 'Subscribed — welcome back!' : 'Free year started 🎉');
+    }
+    else if (b.id === 'ob-back') { S.obStep--; render(); }
+    else if (b.id === 'ob-next') {
+      const n = screen.querySelector('#ob-name'); if (n) S.name = n.value;
+      if (S.obStep < 2) { S.obStep++; render(); }
+      else { S.view = 'app'; render(); toast('You’re all set!'); }
+    }
+    else if (b.dataset.diet) { S.diet = b.dataset.diet; render(); }
+    else if (b.dataset.tab) { S.tab = b.dataset.tab; render(); }
+    else if (b.id === 'banner-details') { S.tab = 'settings'; render(); }
+    else if (b.id === 'water-plus') { S.water++; render(); }
+    else if (b.id === 'water-minus') { S.water = Math.max(0, S.water - 1); render(); }
+    else if (b.dataset.meal !== undefined && b.dataset.cat) {
+      const m = S.meals[+b.dataset.meal]; m[b.dataset.cat] = !m[b.dataset.cat]; render();
+    }
+    else if (b.dataset.estimate !== undefined) {
+      S.estFor = +b.dataset.estimate;
+      S.estGrams = { protein: 0, carbs: 0, veggies: 0, fat: 0 };
+      render();
+    }
+    else if (b.id === 'est-cancel') { S.estFor = null; render(); }
+    else if (b.id === 'est-use') {
+      const m = S.meals[S.estFor]; m.cal = estTotal(); m.est = true; S.estFor = null;
+      render(); toast(`~${m.cal} kcal logged as estimate`);
+    }
+    else if (b.id === 'share-btn') { S.shareOpen = true; render(); }
+    else if (b.id === 'share-close') { S.shareOpen = false; render(); }
+    else if (b.id === 'import-btn') {
+      const f = FRIEND_FILES.find(x => !S.friends.some(y => y.id === x.id));
+      if (f) { S.friends.push(f); render(); toast(`${f.name}’s progress imported — check Rankings!`); }
+    }
+    else if (b.dataset.unfriend) {
+      S.friends = S.friends.filter(f => f.id !== b.dataset.unfriend); render();
+    }
+  });
+
+  screen.addEventListener('input', e => {
+    const t = e.target;
+    if (t.dataset.calinput !== undefined) {
+      const digits = t.value.replace(/\D/g, '').slice(0, 5);
+      if (t.value !== digits) t.value = digits;
+      const m = S.meals[+t.dataset.calinput];
+      m.cal = digits ? Math.min(+digits, 10000) : null;
+      m.est = false;
+      // update the calories-today card without a full re-render (keeps focus)
+      const card = screen.querySelectorAll('.pcard')[1];
+      if (card) {
+        const total = totalCal();
+        const slot = card.querySelector('h4 span');
+        if (slot) slot.innerHTML = total > 0 ? '~' + total + ' kcal' : '<span class="muted">not logged</span>';
+      }
+      const tag = t.parentElement.querySelector('.est-tag'); if (tag) tag.remove();
+    }
+    if (t.dataset.gram) {
+      S.estGrams[t.dataset.gram] = +t.value;
+      const row = t.closest('.slider-row').querySelector('.top .num');
+      row.textContent = t.value + ' g';
+      const sheet = t.closest('.panel');
+      sheet.querySelector('.totalbox .kcal').textContent = `~${estTotal()} kcal`;
+      const use = sheet.querySelector('#est-use');
+      use.disabled = estTotal() === 0;
+      use.textContent = `Use Estimate (~${estTotal()} kcal)`;
+    }
+    if (t.id === 'set-name' || t.id === 'ob-name') S.name = t.value;
+  });
+  screen.addEventListener('change', e => {
+    if (e.target.id === 'set-name') render();
+  });
+
+  /* demo controls */
+  $('#ctl-reset').addEventListener('click', () => { S = fresh(); $('#ctl-stage').value = 'new'; render(); });
+  $('#ctl-stage').addEventListener('change', e => {
+    S.stage = e.target.value;
+    if (S.stage === 'new' || S.stage === 'lapsed') { S.subscribed = false; S.view = 'paywall'; }
+    else { S.subscribed = true; if (S.view === 'paywall' || S.view === 'purchase') S.view = S.obStep >= 2 ? 'app' : 'onboarding'; }
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
