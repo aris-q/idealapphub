@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#F1EEE6"/>
+  <rect x="230" y="24" width="180" height="336" rx="26" fill="#FAF8F3" stroke="#E4E0D6" stroke-width="3"/>
+  <circle cx="320" cy="40" r="4" fill="#262620" opacity=".7"/>
+  <text x="248" y="76" font-family="Georgia, serif" font-size="21" fill="#262620">My<tspan font-style="italic" fill="#3B7A5A">Journal</tspan></text>
+  <rect x="248" y="90" width="60" height="18" rx="9" fill="#E3EEE7"/>
+  <text x="278" y="103" font-family="Roboto, Arial, sans-serif" font-size="9" fill="#2C5C44" text-anchor="middle">On-device</text>
+  <rect x="248" y="122" width="144" height="74" rx="12" fill="#FAF8F3" stroke="#E4E0D6" stroke-width="2"/>
+  <rect x="256" y="130" width="42" height="13" rx="4" fill="#E3EEE7"/>
+  <rect x="256" y="150" width="110" height="7" rx="3" fill="#262620" opacity=".8"/>
+  <rect x="256" y="163" width="90" height="6" rx="3" fill="#6E6B60" opacity=".6"/>
+  <rect x="256" y="176" width="62" height="13" rx="4" fill="#3B7A5A" opacity=".25"/>
+  <rect x="248" y="206" width="144" height="60" rx="12" fill="#FAF8F3" stroke="#E4E0D6" stroke-width="2"/>
+  <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#E8B84B"/><stop offset=".5" stop-color="#D97843"/><stop offset="1" stop-color="#8A4B52"/>
+  </linearGradient>
+  <rect x="256" y="214" width="128" height="44" rx="8" fill="url(#sun)"/>
+  <rect x="248" y="276" width="144" height="42" rx="12" fill="#F4EAD8"/>
+  <text x="256" y="294" font-family="Roboto, Arial, sans-serif" font-size="9" font-weight="bold" fill="#8A5F1D" letter-spacing="1">AI DRAFT · MEMOIR</text>
+  <rect x="256" y="301" width="118" height="5" rx="2.5" fill="#B9822F" opacity=".6"/>
+  <rect x="256" y="310" width="96" height="5" rx="2.5" fill="#B9822F" opacity=".4"/>
+  <text x="112" y="180" font-family="Georgia, serif" font-size="30" fill="#262620" text-anchor="middle">My<tspan font-style="italic" fill="#3B7A5A">Journal</tspan></text>
+  <text x="112" y="204" font-family="Roboto, Arial, sans-serif" font-size="11" fill="#6E6B60" text-anchor="middle" letter-spacing="2">PRIVATE BY DEFAULT</text>
+  <circle cx="520" cy="150" r="34" fill="#E3EEE7"/>
+  <path d="M508 150 h24 M520 138 v24" stroke="#3B7A5A" stroke-width="4" stroke-linecap="round"/>
+  <text x="520" y="204" font-family="Roboto, Arial, sans-serif" font-size="11" fill="#6E6B60" text-anchor="middle" letter-spacing="2">ANDROID</text>
+</svg>
