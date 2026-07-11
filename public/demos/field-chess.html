@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Field Chess — Luzhanqi</title>
+<style>
+:root{
+  --bg:#141810;
+  --panel:#1d2317;
+  --panel-line:#3a4130;
+  --board:#cfc39a;
+  --board-deep:#bfb184;
+  --road:#6b6244;
+  --rail-dark:#4a4432;
+  --rail-tie:#e6dcb4;
+  --camp:#5f8547;
+  --hq:#8a3a32;
+  --south:#b8463a;
+  --south-dark:#7c281f;
+  --north:#3c74a6;
+  --north-dark:#274f75;
+  --gold:#d4ab35;
+  --text:#ece8d8;
+  --text-dim:#a9a68c;
+  --log-bg:#0e120a;
+  --log-text:#9fd18a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #232b1a 0%, transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',Arial,sans-serif;
+  padding:24px;
+}
+h1{
+  font-weight:900;
+  letter-spacing:5px;
+  text-transform:uppercase;
+  font-size:24px;
+  margin:0 0 2px 0;
+  color:var(--gold);
+  text-shadow:0 2px 0 rgba(0,0,0,.5);
+}
+.subtitle{
+  font-size:12px;
+  color:var(--text-dim);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+.layout{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+.center-col{display:flex;flex-direction:column;gap:12px;align-items:stretch;}
+.side-left{width:280px;}
+.side-right{width:330px;}
+
+/* ============ BOARD ============ */
+.board-wrap{
+  position:relative;
+  padding:18px;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.05), rgba(0,0,0,.25)),
+    var(--panel);
+  border:1px solid var(--panel-line);
+  border-radius:10px;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);
+}
+#board{
+  position:relative;
+  background:
+    radial-gradient(600px 400px at 50% 30%, rgba(255,255,255,.28), transparent 70%),
+    repeating-linear-gradient(2deg, transparent 0 26px, rgba(90,80,50,.07) 26px 27px),
+    linear-gradient(180deg, var(--board), var(--board-deep));
+  border:3px solid #5b5338;
+  border-radius:6px;
+  box-shadow:inset 0 0 30px rgba(80,65,30,.35);
+  overflow:hidden;
+}
+#gridSvg{position:absolute;inset:0;pointer-events:none;}
+.cell{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  z-index:3;
+}
+.cell.legal::after{
+  content:'';
+  position:absolute;
+  width:16px;height:16px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #ffe9a3, var(--gold) 70%);
+  box-shadow:0 0 10px rgba(212,171,53,.9);
+  animation:legalPulse 1.1s ease-in-out infinite;
+}
+.cell.legal.attack::after{
+  width:34px;height:34px;background:none;
+  border:3px solid #e04a3a;
+  box-shadow:0 0 12px rgba(224,74,58,.8);
+}
+@keyframes legalPulse{50%{transform:scale(1.25);opacity:.75;}}
+.cell.selected .piece{
+  box-shadow:0 0 0 3px var(--gold), 0 0 18px rgba(212,171,53,.9), 0 5px 8px rgba(0,0,0,.5);
+  animation:selGlow 1.4s ease-in-out infinite;
+}
+@keyframes selGlow{50%{box-shadow:0 0 0 3px #ffe9a3, 0 0 26px rgba(212,171,53,1), 0 5px 8px rgba(0,0,0,.5);}}
+.cell.lastmove::before{
+  content:'';position:absolute;inset:4px;
+  border:2px dashed rgba(212,171,53,.55);border-radius:8px;
+}
+
+/* ============ PIECES ============ */
+.piece{
+  width:54px;height:42px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+  border-radius:7px;
+  user-select:none;
+  position:relative;
+  box-shadow:0 4px 6px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .12s ease;
+}
+.piece:hover{transform:translateY(-2px);}
+.piece.S{background:linear-gradient(180deg,#cf5a4c 0%,var(--south) 45%,var(--south-dark) 100%);border:1.5px solid var(--south-dark);color:#ffe7c4;}
+.piece.N{background:linear-gradient(180deg,#5c92c2 0%,var(--north) 45%,var(--north-dark) 100%);border:1.5px solid var(--north-dark);color:#e4f0ff;}
+.piece.flagpiece{background:linear-gradient(180deg,#f0d070,#c9a227 55%,#8a6f10);border:1.5px solid #6b5508;color:#3a2c05;}
+.piece .em{width:22px;height:22px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4));}
+.piece .lbl{
+  font-size:7px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  margin-top:1px;opacity:.92;font-family:Arial,sans-serif;
+}
+.piece.back{
+  background:linear-gradient(180deg,#3a3f2e,#262a1d);
+  border:1.5px solid #191c12;color:#8b9078;
+}
+.piece.back.S{box-shadow:inset 0 0 0 2px rgba(184,70,58,.45),0 4px 6px rgba(0,0,0,.45);}
+.piece.back.N{box-shadow:inset 0 0 0 2px rgba(60,116,166,.45),0 4px 6px rgba(0,0,0,.45);}
+.piece.back .em{opacity:.8;}
+.piece.dropIn{animation:dropIn .28s cubic-bezier(.2,1.4,.4,1);}
+@keyframes dropIn{0%{transform:scale(1.35);}100%{transform:scale(1);}}
+
+/* piece emblem animations */
+.em-flag .cloth{transform-origin:7px 4px;animation:flagWave 1.5s ease-in-out infinite;}
+@keyframes flagWave{0%,100%{transform:skewY(0deg) scaleX(1);}50%{transform:skewY(5deg) scaleX(.94);}}
+.em-bomb .spark{animation:sparkFlick .45s steps(2,end) infinite;transform-origin:18px 4px;}
+@keyframes sparkFlick{0%{opacity:1;transform:scale(1);}50%{opacity:.25;transform:scale(.6);}100%{opacity:1;transform:scale(1.1);}}
+.em-mine .core{animation:minePulse 1.8s ease-in-out infinite;transform-origin:12px 13px;}
+@keyframes minePulse{50%{opacity:.35;transform:scale(.7);}}
+.em-eng .gear{animation:gearSpin 6s linear infinite;transform-origin:12px 12px;}
+@keyframes gearSpin{to{transform:rotate(360deg);}}
+
+/* ============ RIVER ============ */
+.river{
+  position:absolute;left:0;right:0;
+  overflow:hidden;
+  z-index:2;
+  border-top:3px solid #9b8b5c;
+  border-bottom:3px solid #9b8b5c;
+  background:linear-gradient(180deg,#7fb2c9 0%,#3f7fa0 25%,#2c6485 55%,#1f4f6d 100%);
+  box-shadow:inset 0 6px 12px rgba(10,40,60,.55), inset 0 -6px 12px rgba(10,40,60,.55);
+}
+.river .bank{position:absolute;left:0;right:0;height:7px;z-index:4;}
+.river .bank.top{top:0;background:linear-gradient(180deg,#c8b887,#a8905e 60%,rgba(120,150,120,.0));}
+.river .bank.bot{bottom:0;background:linear-gradient(0deg,#c8b887,#a8905e 60%,rgba(120,150,120,.0));}
+.wave{
+  position:absolute;left:0;top:0;height:100%;width:200%;
+  animation:drift linear infinite;
+}
+.wave.w1{animation-duration:9s;opacity:.5;}
+.wave.w2{animation-duration:14s;animation-direction:reverse;opacity:.3;top:30%;}
+.wave.w3{animation-duration:7s;opacity:.35;top:55%;}
+@keyframes drift{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.glint{
+  position:absolute;height:2px;border-radius:2px;
+  background:rgba(255,255,255,.75);
+  animation:glint ease-in-out infinite;
+}
+@keyframes glint{0%,100%{opacity:0;}50%{opacity:.9;}}
+.fish{
+  position:absolute;width:26px;height:12px;z-index:3;
+  animation:swim linear infinite;
+}
+.fish svg{width:100%;height:100%;}
+@keyframes swim{
+  0%{transform:translateX(-40px) scaleX(1);}
+  49%{transform:translateX(360px) scaleX(1);}
+  50%{transform:translateX(360px) scaleX(-1);}
+  99%{transform:translateX(-40px) scaleX(-1);}
+  100%{transform:translateX(-40px) scaleX(1);}
+}
+.bridge{
+  position:absolute;top:-4px;bottom:-4px;width:42px;z-index:5;
+  background:
+    repeating-linear-gradient(180deg,#96733f 0 7px,#7a5a2e 7px 9px);
+  border-left:4px solid #5c4425;
+  border-right:4px solid #5c4425;
+  box-shadow:0 0 10px rgba(0,0,0,.55), inset 0 0 6px rgba(0,0,0,.3);
+  border-radius:2px;
+}
+.bridge::before,.bridge::after{
+  content:'';position:absolute;top:6px;bottom:6px;width:2px;
+  background:rgba(40,28,12,.55);
+}
+.bridge::before{left:9px;}
+.bridge::after{right:9px;}
+
+/* ============ SIDEBAR ============ */
+.sidebar{width:320px;display:flex;flex-direction:column;gap:14px;}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--panel-line);
+  border-radius:8px;
+  padding:12px 14px;
+}
+.panel h2{
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);margin:0 0 8px 0;
+}
+.turn-banner{
+  font-weight:800;letter-spacing:1.5px;
+  padding:11px 12px;text-align:center;text-transform:uppercase;font-size:13px;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,.35);
+}
+.turn-banner .dot{width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff;animation:legalPulse 1.2s infinite;}
+.turn-banner.S{background:linear-gradient(180deg,#c5544a,var(--south-dark));color:#fff;}
+.turn-banner.N{background:linear-gradient(180deg,#4d84b5,var(--north-dark));color:#fff;}
+.turn-banner.over{background:linear-gradient(180deg,#e0c05a,#8a6f10);color:#241c02;}
+button{
+  font-family:inherit;
+  background:#2a2f1e;color:var(--text);
+  border:1px solid var(--panel-line);
+  padding:8px 11px;cursor:pointer;font-size:12px;letter-spacing:1px;
+  border-radius:6px;
+  transition:all .12s;
+}
+button:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px rgba(212,171,53,.35);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+.log{
+  background:var(--log-bg);color:var(--log-text);
+  font-family:'Courier New',monospace;
+  font-size:11px;height:340px;overflow-y:auto;padding:8px;line-height:1.5;
+  border:1px solid #000;border-radius:4px;
+}
+.log div{border-bottom:1px dashed #1e2a17;padding:2px 0;}
+.log div.cur{background:#2a3a1c;color:#ffe9a3;font-weight:700;}
+.log div.sys{color:#c9a94f;}
+.captured{display:flex;flex-wrap:wrap;gap:4px;min-height:22px;}
+.captured .chip{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;color:#fff;
+}
+.captured .chip.S{background:var(--south-dark);}
+.captured .chip.N{background:var(--north-dark);}
+.captured .chip svg{width:11px;height:11px;}
+.quick{font-size:11.5px;color:var(--text-dim);line-height:1.7;}
+.quick b{color:var(--text);}
+
+/* ============ OVERLAYS ============ */
+.overlay{
+  position:fixed;inset:0;background:rgba(8,10,6,.94);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  z-index:50;
+}
+.overlay h2{letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-size:26px;margin:0;}
+.hidden-el{display:none !important;}
+
+/* rules modal */
+.rules-modal{
+  position:fixed;inset:0;background:rgba(8,10,6,.9);z-index:60;
+  display:flex;align-items:center;justify-content:center;padding:30px;
+}
+.rules-box{
+  background:var(--panel);border:1px solid var(--gold);border-radius:10px;
+  max-width:720px;max-height:85vh;overflow-y:auto;padding:26px 30px;
+  box-shadow:0 20px 60px rgba(0,0,0,.7);
+}
+.rules-box h2{color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-top:0;}
+.rules-box h3{color:var(--gold);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;margin:18px 0 6px;}
+.rules-box p,.rules-box li{font-size:13px;line-height:1.7;color:var(--text);}
+.rules-box .ranktable{width:100%;border-collapse:collapse;margin:8px 0;}
+.rules-box .ranktable td{
+  border-bottom:1px solid var(--panel-line);padding:5px 8px;font-size:12px;
+}
+.rules-box .ranktable .emcell{width:36px;}
+.rules-box .ranktable svg{width:22px;height:22px;color:#ffd98a;background:linear-gradient(180deg,#5c92c2,#274f75);border-radius:4px;padding:2px;}
+.rules-box .closebar{text-align:right;margin-top:14px;}
+</style>
+</head>
+<body>
+
+<h1>Field Chess</h1>
+<div class="subtitle">Luzhanqi · Chinese Military Chess — English edition</div>
+
+<div class="layout">
+  <div class="sidebar side-left">
+    <div class="panel">
+      <h2>Controls</h2>
+      <div class="btn-row">
+        <button id="newGameBtn">New Game</button>
+        <button id="shuffleBtn">Shuffle My Side</button>
+        <button id="startBtn">Start Battle</button>
+        <button id="aiBtn">AI Opponent: Off</button>
+        <button id="rulesBtn">Full Rules</button>
+        <button id="revealBtn">Reveal Enemy (debug): Off</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Quick Reference</h2>
+      <div class="quick">
+        <b>Goal:</b> capture the enemy Flag.<br>
+        <b>Hidden info:</b> enemy pieces stay face-down for the whole game — combat only tells you the <i>result</i>, never the identity. The single exception: when a side's <b>Field Marshal</b> dies, that side's <b>Flag</b> is immediately revealed.<br>
+        <b>Setup:</b> click two of your pieces to swap them, then Start Battle.<br>
+        <b>Ranks:</b> Marshal &gt; General &gt; Lt.&nbsp;General &gt; Brigadier &gt; Colonel &gt; Major &gt; Captain &gt; Lieutenant &gt; Engineer.<br>
+        <b>River:</b> cross only on the three bridges.<br>
+        <b>Railways</b> (track lines): slide any distance straight; Engineers may turn corners.<br>
+        <b>Camps</b> (green circles) are safe — no attacks inside.<br>
+        <b>Mines</b> kill everyone except Engineers. <b>Bombs</b> trade with anything.<br>
+        When the game ends, the full battle record is revealed and you can <b>Replay</b> the whole game move by move with all pieces visible.
+      </div>
+    </div>
+  </div>
+
+  <div class="center-col">
+    <div class="turn-banner" id="turnBanner"><span class="dot"></span><span id="turnText">South to move</span></div>
+    <div class="board-wrap">
+      <div id="board"></div>
+    </div>
+  </div>
+
+  <div class="sidebar side-right">
+    <div class="panel">
+      <h2>Battle Record</h2>
+      <div class="log" id="log"></div>
+      <div class="btn-row" style="margin-top:8px;">
+        <button id="copyLogBtn">Copy Log</button>
+        <button id="replayBtn" style="display:none;">▶ Replay Game</button>
+        <button id="replayPauseBtn" style="display:none;">⏸ Pause</button>
+        <button id="replayStepBtn" style="display:none;">⏭ Step</button>
+        <button id="replayExitBtn" style="display:none;">✕ Exit Replay</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Captured — South</h2>
+      <div class="captured" id="capturedS"></div>
+      <h2 style="margin-top:10px;">Captured — North</h2>
+      <div class="captured" id="capturedN"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden-el" id="passOverlay">
+  <h2 id="passText">Pass device to North</h2>
+  <button id="passReadyBtn">Ready</button>
+</div>
+
+<div class="overlay hidden-el" id="winOverlay">
+  <h2 id="winText">South wins!</h2>
+  <div class="btn-row">
+    <button id="winReplayBtn">▶ Replay Game</button>
+    <button id="winViewBtn">View Board</button>
+    <button id="winNewBtn">Play Again</button>
+  </div>
+</div>
+
+<div class="rules-modal hidden-el" id="rulesModal">
+  <div class="rules-box">
+    <h2>Field Chess — Rules of Play</h2>
+
+    <h3>Objective</h3>
+    <p>Capture the enemy <b>Flag</b>. You also win if your opponent has no pieces left that can legally move.</p>
+
+    <h3>The Board</h3>
+    <p>Each side controls the six rows nearest to them. A <b>river</b> divides the two territories and can only be crossed at the <b>three bridges</b> (left, centre, right). Special points:</p>
+    <ul>
+      <li><b>Camps</b> (green circles, 5 per side) — a piece resting in a camp cannot be attacked. You may only step into an <i>empty</i> camp; you can never capture into one. Camps connect diagonally to the surrounding points.</li>
+      <li><b>Headquarters</b> (two red posts on each back row) — the Flag starts in one of them. Any piece that enters an HQ is frozen there for the rest of the game.</li>
+      <li><b>Railways</b> — the thick track lines (both side columns and the two rows beside the river). A piece on a railway slides any number of empty points in a straight line, like a rook. The <b>Engineer</b> is special: it may turn corners and travel the whole connected railway network in one move.</li>
+    </ul>
+
+    <h3>Ranks &amp; Special Pieces</h3>
+    <table class="ranktable" id="rankTable"></table>
+    <p>When two pieces meet, the higher rank wins; equal ranks destroy each other. Combat never reveals identities — you only learn the <i>result</i> (attacker falls, defender falls, or both fall). Losses go to the captured trays face-down; you always know your own losses, never your opponent's.</p>
+    <p><b>The Marshal exception:</b> the moment a side's Field Marshal is destroyed, that side's Flag is immediately revealed to everyone. This is the only piece of hidden information disclosed during play.</p>
+    <ul>
+      <li><b>Flag</b> — never moves. Lose it and you lose the game.</li>
+      <li><b>Landmine</b> (×3) — never moves; placed in the back two rows. It destroys any attacker <i>except</i> the Engineer, who defuses it and removes it from play.</li>
+      <li><b>Bomb</b> (×2) — moves like a normal piece but destroys itself <i>and</i> whatever it attacks (or whatever attacks it), regardless of rank. It may not start on the front row.</li>
+      <li><b>Engineer</b> (×3) — the weakest fighter, but defuses mines and can turn corners on railways.</li>
+    </ul>
+
+    <h3>Movement</h3>
+    <ul>
+      <li>Pieces move one step along any drawn line (including camp diagonals) — except on railways, where they slide.</li>
+      <li>Crossing the river is only possible over the three bridges.</li>
+      <li>The Flag and Landmines never move; pieces inside an HQ are frozen.</li>
+    </ul>
+
+    <h3>Winning</h3>
+    <ul>
+      <li>Capture the enemy Flag, or</li>
+      <li>Leave your opponent with no legal moves.</li>
+    </ul>
+
+    <h3>Setup Phase</h3>
+    <p>Before battle, arrange your own side: click one of your pieces, then click a highlighted point to move or swap it. Placement rules are enforced — the Flag must sit in an HQ, Landmines in the back two rows, Bombs off the front row, and no piece may start in a camp. Use <b>Shuffle My Side</b> for a new random layout, then press <b>Start Battle</b>. In a two-player game each side arranges secretly in turn.</p>
+
+    <h3>Battle Record &amp; Replay</h3>
+    <ul>
+      <li>Every move is recorded in the Battle Record. During play the record is <i>redacted</i> — it shows only coordinates and combat results, never piece identities.</li>
+      <li>The moment the game ends, all pieces on the board and the complete record (with every identity) are revealed.</li>
+      <li><b>▶ Replay Game</b> steps through the entire battle from the starting setup with both armies face-up, so you can study exactly what happened. Pause, step move by move, or exit at any time.</li>
+    </ul>
+
+    <h3>Options</h3>
+    <ul>
+      <li>Enemy pieces stay face-down for the whole game. In two-player mode the screen prompts you to pass the device between turns.</li>
+      <li><b>AI Opponent</b> — North is played by the computer.</li>
+      <li><b>Reveal Enemy (debug)</b> — turns off hidden information, for learning the game.</li>
+    </ul>
+
+    <div class="closebar"><button id="rulesCloseBtn">Close</button></div>
+  </div>
+</div>
+
+<script>
+/* ================= GEOMETRY ================= */
+const ROWS=12, COLS=5;
+const CW=64, CH=50, RIVER_H=74;
+const BOARD_W=COLS*CW, BOARD_H=ROWS*CH+RIVER_H;
+const RIVER_TOP=6*CH;
+const BRIDGE_COLS=[0,2,4];
+
+function nodeX(c){return c*CW+CW/2;}
+function nodeY(r){return r*CH+CH/2+(r>=6?RIVER_H:0);}
+function idx(r,c){return r*COLS+c;}
+function coordName(r,c){return String.fromCharCode(65+c)+(r+1);}
+function cellKey(r,c){return r+'_'+c;}
+
+const campGroupsN=[[2,1],[2,3],[3,2],[4,1],[4,3]];
+const campGroupsS=[[9,1],[9,3],[8,2],[7,1],[7,3]];
+const campGroups=[campGroupsN,campGroupsS];
+
+const diagonalEdgesRaw=[
+  [[2,1],[3,2]],[[2,3],[3,2]],[[4,1],[3,2]],[[4,3],[3,2]],
+  [[2,1],[1,0]],[[2,1],[1,2]],[[2,3],[1,2]],[[2,3],[1,4]],
+  [[4,1],[5,0]],[[4,1],[5,2]],[[4,3],[5,2]],[[4,3],[5,4]],
+  [[7,1],[8,2]],[[7,3],[8,2]],[[9,1],[8,2]],[[9,3],[8,2]],
+  [[7,1],[6,0]],[[7,1],[6,2]],[[7,3],[6,2]],[[7,3],[6,4]],
+  [[9,1],[10,0]],[[9,1],[10,2]],[[9,3],[10,2]],[[9,3],[10,4]]
+];
+const diagonalMap={};
+diagonalEdgesRaw.forEach(([a,b])=>{
+  const ka=cellKey(a[0],a[1]), kb=cellKey(b[0],b[1]);
+  (diagonalMap[ka]=diagonalMap[ka]||[]).push(b);
+  (diagonalMap[kb]=diagonalMap[kb]||[]).push(a);
+});
+
+function isCamp(r,c){return campGroups.some(g=>g.some(p=>p[0]===r&&p[1]===c));}
+function cellType(r,c){
+  if((r===0||r===11)&&(c===1||c===3)) return 'hq';
+  if(isCamp(r,c)) return 'camp';
+  return 'normal';
+}
+function isRail(r,c){
+  if(r===5||r===6) return true;
+  if((c===0||c===4)&&r>=1&&r<=10) return true;
+  return false;
+}
+/* vertical step across the river is only legal on the three bridges */
+function riverBlocked(r1,c1,r2,c2){
+  if(Math.min(r1,r2)===5 && Math.max(r1,r2)===6 && c1===c2)
+    return !BRIDGE_COLS.includes(c1);
+  return false;
+}
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+/* ================= PIECES ================= */
+const pieceTypes=[
+  {id:'flag',name:'Flag',lbl:'Flag',rank:-2,count:1,static:true},
+  {id:'marshal',name:'Field Marshal',lbl:'Marshal',rank:9,count:1},
+  {id:'general',name:'General',lbl:'General',rank:8,count:1},
+  {id:'ltgeneral',name:'Lt. General',lbl:'Lt Gen',rank:7,count:2},
+  {id:'brigadier',name:'Brigadier',lbl:'Brig',rank:6,count:2},
+  {id:'colonel',name:'Colonel',lbl:'Col',rank:5,count:2},
+  {id:'major',name:'Major',lbl:'Major',rank:4,count:2},
+  {id:'captain',name:'Captain',lbl:'Capt',rank:3,count:3},
+  {id:'lieutenant',name:'Lieutenant',lbl:'Lieut',rank:2,count:3},
+  {id:'engineer',name:'Engineer',lbl:'Eng',rank:1,count:3},
+  {id:'mine',name:'Landmine',lbl:'Mine',rank:0,count:3,static:true},
+  {id:'bomb',name:'Bomb',lbl:'Bomb',rank:-1,count:2}
+];
+
+/* ---- SVG emblems ---- */
+function starPts(cx,cy,r){
+  const pts=[];
+  for(let i=0;i<10;i++){
+    const a=-Math.PI/2+i*Math.PI/5, rr=i%2?r*0.45:r;
+    pts.push((cx+rr*Math.cos(a)).toFixed(1)+','+(cy+rr*Math.sin(a)).toFixed(1));
+  }
+  return '<polygon points="'+pts.join(' ')+'"/>';
+}
+function chev(y){
+  return '<path d="M6 '+y+' L12 '+(y-4.5)+' L18 '+y+'" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>';
+}
+function svgWrap(cls,inner){
+  return '<svg class="em '+cls+'" viewBox="0 0 24 24" fill="currentColor">'+inner+'</svg>';
+}
+const EMBLEMS={
+  flag: svgWrap('em-flag',
+    '<rect x="6" y="2.5" width="1.8" height="19" rx="0.9"/>'+
+    '<path class="cloth" d="M8 4 h11 l-3.2 3.5 L19 11 H8 Z"/>'),
+  marshal: svgWrap('em-marshal', starPts(12,8,5.4)+starPts(5.8,16.5,3.4)+starPts(18.2,16.5,3.4)),
+  general: svgWrap('em-general', starPts(7.3,12,4.6)+starPts(16.7,12,4.6)),
+  ltgeneral: svgWrap('em-ltgen', starPts(12,9,5.2)+'<rect x="5" y="16.5" width="14" height="2.6" rx="1.2"/>'),
+  brigadier: svgWrap('em-brig', starPts(12,12,6.6)),
+  colonel: svgWrap('em-col', chev(8.5)+chev(14)+chev(19.5)),
+  major: svgWrap('em-maj', chev(10.5)+chev(16.5)),
+  captain: svgWrap('em-capt', chev(13.5)),
+  lieutenant: svgWrap('em-lt', '<rect x="5.5" y="10.5" width="13" height="3" rx="1.4"/>'),
+  engineer: svgWrap('em-eng',
+    '<g class="gear">'+
+    '<circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2.4"/>'+
+    [0,45,90,135,180,225,270,315].map(a=>{
+      const rad=a*Math.PI/180;
+      const x1=12+6*Math.cos(rad),y1=12+6*Math.sin(rad);
+      const x2=12+9*Math.cos(rad),y2=12+9*Math.sin(rad);
+      return '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>';
+    }).join('')+
+    '</g><circle cx="12" cy="12" r="1.8"/>'),
+  mine: svgWrap('em-mine',
+    [0,45,90,135,180,225,270,315].map(a=>{
+      const rad=a*Math.PI/180;
+      const x1=12+6*Math.cos(rad),y1=13+6*Math.sin(rad);
+      const x2=12+9.5*Math.cos(rad),y2=13+9.5*Math.sin(rad);
+      return '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+    }).join('')+
+    '<circle cx="12" cy="13" r="6"/>'+
+    '<circle class="core" cx="12" cy="13" r="2.4" fill="#ffdf7e"/>'),
+  bomb: svgWrap('em-bomb',
+    '<circle cx="11" cy="14.5" r="7"/>'+
+    '<rect x="9.4" y="6" width="3.2" height="3" rx="1"/>'+
+    '<path d="M11 6.5 Q13 2.5 17 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'+
+    '<g class="spark" fill="#ffd23e">'+starPts(18,3.6,2.8)+'</g>'+
+    '<circle cx="8.6" cy="12" r="1.6" fill="rgba(255,255,255,.4)"/>'),
+  unknown: svgWrap('em-unknown',
+    '<path d="M8 9 a4 4 0 1 1 5.5 3.7 c-1.2.5-1.5 1.2-1.5 2.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'+
+    '<circle cx="12" cy="19.4" r="1.6"/>')
+};
+
+/* ================= STATE ================= */
+let board, selected, currentLegalMoves, currentTurn, revealEnemy, aiEnabled, gameOver, capturedS, capturedN, lastMove;
+let phase, setupSide; /* phase: 'setup' | 'play' */
+let records, moveCount;             /* full battle record (identities hidden until game over) */
+let initialSnapshot;                /* board right after Start Battle, for replay */
+let replayMode, replayBoard, replayRecIndex, replayTimer, replayPaused;
+
+function buildPieces(owner){
+  const list=[];
+  pieceTypes.forEach(pt=>{
+    for(let i=0;i<pt.count;i++){
+      list.push({type:pt.id,name:pt.name,lbl:pt.lbl,rank:pt.rank,owner,revealed:false,static:!!pt.static,frozen:false,r:-1,c:-1});
+    }
+  });
+  return list;
+}
+
+function placeSideRandomly(owner){
+  const hqRow= owner==='N' ? 0 : 11;
+  const frontRow= owner==='N' ? 5 : 6;
+  const backRows= owner==='N' ? [0,1] : [10,11];
+  const sideRows= owner==='N' ? [0,1,2,3,4,5] : [6,7,8,9,10,11];
+
+  const flagCol = Math.random()<0.5 ? 1 : 3;
+  const pieces=shuffle(buildPieces(owner));
+  const flagPiece=pieces.find(p=>p.type==='flag');
+  flagPiece.r=hqRow; flagPiece.c=flagCol;
+  board[idx(hqRow,flagCol)]=flagPiece;
+
+  const allCells=[];
+  for(const r of sideRows){
+    for(let c=0;c<COLS;c++){
+      if(cellType(r,c)==='camp') continue;
+      if(r===hqRow&&c===flagCol) continue;
+      allCells.push([r,c]);
+    }
+  }
+  const mines=pieces.filter(p=>p.type==='mine');
+  const bombs=pieces.filter(p=>p.type==='bomb');
+  const others=pieces.filter(p=>p.type!=='mine'&&p.type!=='bomb'&&p.type!=='flag');
+
+  const mineCells=shuffle(allCells.filter(([r])=>backRows.includes(r))).slice(0,mines.length);
+  mines.forEach((p,i)=>{const [r,c]=mineCells[i];p.r=r;p.c=c;board[idx(r,c)]=p;});
+
+  let remaining=allCells.filter(cell=>!mineCells.some(mc=>mc[0]===cell[0]&&mc[1]===cell[1]));
+  const bombCells=shuffle(remaining.filter(([r])=>r!==frontRow)).slice(0,bombs.length);
+  bombs.forEach((p,i)=>{const [r,c]=bombCells[i];p.r=r;p.c=c;board[idx(r,c)]=p;});
+
+  remaining=remaining.filter(cell=>!bombCells.some(bc=>bc[0]===cell[0]&&bc[1]===cell[1]));
+  const pool=shuffle(remaining);
+  others.forEach((p,i)=>{const [r,c]=pool[i];p.r=r;p.c=c;board[idx(r,c)]=p;});
+}
+
+function setupBoard(){
+  board=new Array(ROWS*COLS).fill(null);
+  placeSideRandomly('N');
+  placeSideRandomly('S');
+}
+
+/* ================= SETUP PHASE ================= */
+function validPlacement(p,r,c){
+  const own = p.owner==='N' ? r>=0&&r<=5 : r>=6&&r<=11;
+  if(!own) return false;
+  if(cellType(r,c)==='camp') return false;
+  const hqRow = p.owner==='N' ? 0 : 11;
+  const frontRow = p.owner==='N' ? 5 : 6;
+  const backRows = p.owner==='N' ? [0,1] : [10,11];
+  if(p.type==='flag') return r===hqRow&&(c===1||c===3);
+  if(p.type==='mine') return backRows.includes(r);
+  if(p.type==='bomb') return r!==frontRow;
+  return true;
+}
+/* cells where the selected piece may be placed (empty valid cell, or swap with own piece if both stay valid) */
+function setupTargets(p){
+  const out=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    if(r===p.r&&c===p.c) continue;
+    if(!validPlacement(p,r,c)) continue;
+    const occ=board[idx(r,c)];
+    if(!occ){ out.push([r,c]); continue; }
+    if(occ.owner===p.owner&&validPlacement(occ,p.r,p.c)) out.push([r,c]);
+  }
+  return out;
+}
+function setupSwap(p,r,c){
+  const occ=board[idx(r,c)];
+  board[idx(p.r,p.c)]=occ||null;
+  if(occ){ occ.r=p.r; occ.c=p.c; }
+  board[idx(r,c)]=p;
+  p.r=r; p.c=c;
+}
+function shuffleSide(owner){
+  /* remove this side's pieces and re-place them randomly */
+  board.forEach((p,i)=>{ if(p&&p.owner===owner) board[i]=null; });
+  placeSideRandomly(owner);
+}
+function startBattle(){
+  if(phase!=='setup') return;
+  if(setupSide==='S' && !aiEnabled){
+    setupSide='N';
+    selected=null; currentLegalMoves=[];
+    document.getElementById('passText').textContent='Pass device to North — arrange your pieces';
+    document.getElementById('passOverlay').classList.remove('hidden-el');
+    render();
+    return;
+  }
+  phase='play';
+  selected=null; currentLegalMoves=[]; currentTurn='S'; lastMove=null;
+  board.forEach(p=>{ if(p) p.frozen = cellType(p.r,p.c)==='hq'; });
+  initialSnapshot=cloneBoard(board);
+  addLog('Battle begins. South moves first.');
+  if(!aiEnabled&&setupSide==='N'){
+    document.getElementById('passText').textContent='Pass device to South';
+    document.getElementById('passOverlay').classList.remove('hidden-el');
+  }
+  render();
+}
+
+/* ================= MOVES ================= */
+function canEnter(rr,cc,owner){
+  const occ=board[idx(rr,cc)];
+  if(!occ) return true;
+  if(occ.owner===owner) return false;
+  if(cellType(rr,cc)==='camp') return false;
+  return true;
+}
+
+function railNeighbors(r,c){
+  const out=[];
+  [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{
+    const nr=r+dr,nc=c+dc;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS) return;
+    if(!isRail(nr,nc)) return;
+    if(riverBlocked(r,c,nr,nc)) return;
+    out.push([nr,nc]);
+  });
+  return out;
+}
+
+function legalMoves(p){
+  if(p.static||p.frozen) return [];
+  const {r,c}=p;
+  const moves=[];
+  const diag=diagonalMap[cellKey(r,c)];
+  if(diag) diag.forEach(([rr,cc])=>{ if(canEnter(rr,cc,p.owner)) moves.push([rr,cc]); });
+
+  const onRail=isRail(r,c);
+  const isEng=p.type==='engineer';
+
+  [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>{
+    let nr=r+dr, nc=c+dc;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS) return;
+    if(riverBlocked(r,c,nr,nc)) return;
+    if(onRail&&isRail(nr,nc)){
+      if(isEng) return; /* engineer rail travel handled by BFS below */
+      let pr=r, pc=c;
+      while(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&isRail(nr,nc)&&!riverBlocked(pr,pc,nr,nc)){
+        const occ=board[idx(nr,nc)];
+        if(!occ){ moves.push([nr,nc]); pr=nr;pc=nc; nr+=dr; nc+=dc; continue; }
+        if(canEnter(nr,nc,p.owner)) moves.push([nr,nc]);
+        break;
+      }
+    } else {
+      if(canEnter(nr,nc,p.owner)) moves.push([nr,nc]);
+    }
+  });
+
+  /* Engineer: free travel over the connected railway network */
+  if(isEng&&onRail){
+    const visited=new Set([cellKey(r,c)]);
+    const queue=[[r,c]];
+    while(queue.length){
+      const [qr,qc]=queue.shift();
+      railNeighbors(qr,qc).forEach(([nr,nc])=>{
+        const key=cellKey(nr,nc);
+        if(visited.has(key)) return;
+        visited.add(key);
+        const occ=board[idx(nr,nc)];
+        if(!occ){ moves.push([nr,nc]); queue.push([nr,nc]); }
+        else if(canEnter(nr,nc,p.owner)) moves.push([nr,nc]);
+      });
+    }
+  }
+
+  const seen=new Set();
+  return moves.filter(([rr,cc])=>{
+    const key=cellKey(rr,cc);
+    if(seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+}
+
+/* ================= GAME FLOW ================= */
+function sideName(o){return o==='S'?'South':'North';}
+function removePiece(p){
+  (p.owner==='S'?capturedS:capturedN).push(p);
+}
+function addLog(msg){
+  records.push({kind:'sys',text:msg});
+  renderLog();
+}
+
+/* Pure combat resolution — mutates bd, no logging. Shared by live play and replay. */
+function resolveMove(bd,p,r,c){
+  const ti=idx(r,c), fi=idx(p.r,p.c);
+  const d=bd[ti];
+  let result, moved;
+  if(!d){ result='move'; moved=true; }
+  else if(d.type==='flag'){ result='flag'; moved=true; }
+  else if(p.type==='bomb'||d.type==='bomb'){ result='both'; moved=false; }
+  else if(d.type==='mine'){ moved = p.type==='engineer'; result = moved?'defuse':'lose'; }
+  else if(p.rank>d.rank){ result='win'; moved=true; }
+  else if(p.rank===d.rank){ result='both'; moved=false; }
+  else { result='lose'; moved=false; }
+  bd[fi]=null;
+  if(moved){
+    bd[ti]=p; p.r=r; p.c=c;
+    if(cellType(r,c)==='hq') p.frozen=true;
+  } else if(result==='both'){
+    bd[ti]=null;
+  } /* 'lose': defender stays in place */
+  return {result,defender:d,moved};
+}
+
+/* redacted text: what both players are allowed to know during the game */
+function redactedText(rec){
+  const base=rec.n+'. '+sideName(rec.side)+' '+rec.from+' → '+rec.to;
+  const map={
+    move:'',
+    win:' — attack: defender falls',
+    defuse:' — attack: defender falls',
+    lose:' — attack: attacker falls',
+    both:' — attack: both fall',
+    flag:' — the FLAG is captured!'
+  };
+  return base+map[rec.result];
+}
+/* full text: revealed once the game is over / during replay */
+function fullText(rec){
+  const a=sideName(rec.side)+' '+rec.attacker;
+  const d=rec.defender?sideName(rec.defSide)+' '+rec.defender:'';
+  const map={
+    move:' moves',
+    win:' captures '+d+' —',
+    defuse:' defuses '+d+' —',
+    lose:' falls to '+d+' —',
+    both:' trades with '+d+' —',
+    flag:' captures the '+d+'!'
+  };
+  return rec.n+'. '+a+map[rec.result]+' '+rec.from+' → '+rec.to;
+}
+function renderLog(){
+  const el=document.getElementById('log');
+  const full=gameOver||replayMode||revealEnemy;
+  el.innerHTML=records.map((rec,i)=>{
+    const cls=(rec.kind==='sys'?'sys':'')+(replayMode&&i===replayRecIndex?' cur':'');
+    const txt=rec.kind==='sys'?'· '+rec.text:(full?fullText(rec):redactedText(rec));
+    return '<div class="'+cls+'">'+txt+'</div>';
+  }).join('');
+  if(replayMode){
+    const curEl=el.querySelector('.cur');
+    if(curEl) curEl.scrollIntoView({block:'nearest'});
+  } else {
+    el.scrollTop=el.scrollHeight;
+  }
+}
+
+function applyMove(p,r,c){
+  const rec={
+    kind:'move', n:++moveCount, side:p.owner,
+    from:coordName(p.r,p.c), to:coordName(r,c),
+    fromR:p.r, fromC:p.c, toR:r, toC:c,
+    attacker:p.name, defender:null, defSide:null, result:null
+  };
+  lastMove={fromR:p.r,fromC:p.c,toR:r,toC:c};
+  const {result,defender}=resolveMove(board,p,r,c);
+  rec.result=result;
+  if(defender){ rec.defender=defender.name; rec.defSide=defender.owner; }
+  records.push(rec);
+
+  const dead=[];
+  if(result==='both'){ dead.push(p,defender); }
+  else if(result==='lose'){ dead.push(p); }
+  else if(result==='win'||result==='defuse'||result==='flag'){ dead.push(defender); }
+  dead.forEach(removePiece);
+
+  /* the one exception to hidden information: a fallen Field Marshal exposes its Flag */
+  dead.forEach(x=>{
+    if(x.type==='marshal'){
+      const fl=board.find(q=>q&&q.owner===x.owner&&q.type==='flag');
+      if(fl){
+        fl.revealed=true;
+        records.push({kind:'sys',text:sideName(x.owner)+"'s FIELD MARSHAL has fallen — "+sideName(x.owner)+"'s Flag at "+coordName(fl.r,fl.c)+' is revealed!'});
+      }
+    }
+  });
+
+  renderLog();
+  if(result==='flag'){ endGame(p.owner); return; }
+  checkWin();
+}
+
+function checkWin(){
+  const nMovable=board.filter(p=>p&&p.owner==='N'&&!p.static&&!p.frozen).some(p=>legalMoves(p).length>0);
+  const sMovable=board.filter(p=>p&&p.owner==='S'&&!p.static&&!p.frozen).some(p=>legalMoves(p).length>0);
+  const nCount=board.filter(p=>p&&p.owner==='N').length;
+  const sCount=board.filter(p=>p&&p.owner==='S').length;
+  if(nCount===0||!nMovable){ endGame('S'); return; }
+  if(sCount===0||!sMovable){ endGame('N'); return; }
+}
+
+function endGame(winner){
+  gameOver=true;
+  addLog('=== '+sideName(winner)+' wins the field === All pieces and the full battle record are now revealed.');
+  document.getElementById('winText').textContent=sideName(winner)+' wins!';
+  document.getElementById('winOverlay').classList.remove('hidden-el');
+  renderLog();
+  render();
+}
+
+/* ================= REPLAY ================= */
+function cloneBoard(src){ return src.map(p=>p?{...p}:null); }
+
+function nextMoveRecIndex(from){
+  for(let i=from;i<records.length;i++) if(records[i].kind==='move') return i;
+  return -1;
+}
+function replayStepOnce(){
+  const i=nextMoveRecIndex(replayRecIndex+1);
+  if(i<0){ replayPaused=true; stopReplayTimer(); render(); return; }
+  const rec=records[i];
+  const p=replayBoard[idx(rec.fromR,rec.fromC)];
+  if(p) resolveMove(replayBoard,p,rec.toR,rec.toC);
+  replayRecIndex=i;
+  lastMove={fromR:rec.fromR,fromC:rec.fromC,toR:rec.toR,toC:rec.toC};
+  renderLog();
+  render();
+}
+function stopReplayTimer(){ if(replayTimer){ clearInterval(replayTimer); replayTimer=null; } }
+function startReplayTimer(){ stopReplayTimer(); replayTimer=setInterval(()=>{ if(!replayPaused) replayStepOnce(); },1300); }
+function enterReplay(){
+  if(!gameOver||!initialSnapshot) return;
+  replayMode=true; replayPaused=false;
+  replayBoard=cloneBoard(initialSnapshot);
+  replayRecIndex=-1; lastMove=null;
+  document.getElementById('winOverlay').classList.add('hidden-el');
+  startReplayTimer();
+  renderLog();
+  render();
+}
+function exitReplay(){
+  stopReplayTimer();
+  replayMode=false; replayBoard=null; lastMove=null;
+  renderLog();
+  render();
+}
+
+function switchTurn(){
+  currentTurn = currentTurn==='S' ? 'N' : 'S';
+  if(currentTurn==='N' && aiEnabled){
+    setTimeout(aiTurn,600);
+    return;
+  }
+  if(!revealEnemy){
+    document.getElementById('passText').textContent='Pass device to '+sideName(currentTurn);
+    document.getElementById('passOverlay').classList.remove('hidden-el');
+  }
+}
+
+/* ================= AI ================= */
+function scoreMove(p,r,c){
+  const target=board[idx(r,c)];
+  let score=Math.random()*2;
+  if(!target){
+    score += (r-p.r)*0.3;
+    if(cellType(r,c)==='camp') score+=0.5;
+    return score;
+  }
+  if(p.type==='bomb'||target.type==='bomb'){ score+=4; return score; }
+  if(target.type==='flag'){ score+=50; return score; }
+  if(target.type==='mine'){ score += p.type==='engineer' ? 9 : -12; return score; }
+  if(p.rank>target.rank) score += 6+target.rank;
+  else if(p.rank===target.rank) score += 2;
+  else score -= 8;
+  return score;
+}
+function aiTurn(){
+  if(gameOver) return;
+  const pieces=board.filter(p=>p&&p.owner==='N'&&!p.static&&!p.frozen);
+  let best=null, bestScore=-Infinity;
+  pieces.forEach(p=>{
+    legalMoves(p).forEach(([r,c])=>{
+      const s=scoreMove(p,r,c);
+      if(s>bestScore){ bestScore=s; best={p,r,c}; }
+    });
+  });
+  if(best){
+    applyMove(best.p,best.r,best.c);
+    if(!gameOver) currentTurn='S';
+  } else {
+    addLog('North (AI) has no legal moves.');
+    currentTurn='S';
+  }
+  render();
+}
+
+/* ================= INPUT ================= */
+function onCellClick(r,c){
+  if(gameOver||replayMode) return;
+  const p=board[idx(r,c)];
+  if(phase==='setup'){
+    if(selected){
+      if(selected.r===r&&selected.c===c){ selected=null; currentLegalMoves=[]; render(); return; }
+      if(currentLegalMoves.some(m=>m[0]===r&&m[1]===c)){
+        setupSwap(selected,r,c);
+        selected=null; currentLegalMoves=[]; render(); return;
+      }
+    }
+    if(p&&p.owner===setupSide){ selected=p; currentLegalMoves=setupTargets(p); }
+    else { selected=null; currentLegalMoves=[]; }
+    render();
+    return;
+  }
+  if(selected){
+    if(selected.r===r&&selected.c===c){ selected=null; currentLegalMoves=[]; render(); return; }
+    const legal=currentLegalMoves.some(m=>m[0]===r&&m[1]===c);
+    if(legal){
+      applyMove(selected,r,c);
+      selected=null; currentLegalMoves=[];
+      if(!gameOver) switchTurn();
+      render();
+      return;
+    }
+    if(p&&p.owner===currentTurn){ selected=p; currentLegalMoves=legalMoves(p); render(); return; }
+    selected=null; currentLegalMoves=[]; render();
+    return;
+  }
+  if(p&&p.owner===currentTurn){
+    selected=p; currentLegalMoves=legalMoves(p); render();
+  }
+}
+function currentViewer(){
+  return phase==='setup' ? setupSide : (aiEnabled ? 'S' : currentTurn);
+}
+function pieceVisible(p){
+  if(revealEnemy||gameOver||replayMode) return true;
+  if(p.owner===currentViewer()) return true;
+  return p.revealed; /* only a Flag exposed by its Marshal's death */
+}
+
+/* ================= BOARD SCENERY (built once) ================= */
+function buildBoardScenery(){
+  const boardEl=document.getElementById('board');
+  boardEl.style.width=BOARD_W+'px';
+  boardEl.style.height=BOARD_H+'px';
+
+  /* --- grid network svg --- */
+  let s='<svg id="gridSvg" width="'+BOARD_W+'" height="'+BOARD_H+'" viewBox="0 0 '+BOARD_W+' '+BOARD_H+'">';
+  const roads=[], rails=[];
+  function edge(r1,c1,r2,c2){
+    const railEdge=isRail(r1,c1)&&isRail(r2,c2);
+    const seg={x1:nodeX(c1),y1:nodeY(r1),x2:nodeX(c2),y2:nodeY(r2)};
+    (railEdge?rails:roads).push(seg);
+  }
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS-1;c++) edge(r,c,r,c+1);
+  for(let c=0;c<COLS;c++) for(let r=0;r<ROWS-1;r++){
+    if(r===5&&!BRIDGE_COLS.includes(c)) continue;
+    edge(r,c,r+1,c);
+  }
+  roads.forEach(e=>{
+    s+='<line x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="#6b6244" stroke-width="2.2"/>';
+  });
+  diagonalEdgesRaw.forEach(([a,b])=>{
+    s+='<line x1="'+nodeX(a[1])+'" y1="'+nodeY(a[0])+'" x2="'+nodeX(b[1])+'" y2="'+nodeY(b[0])+'" stroke="#6b6244" stroke-width="2.2"/>';
+  });
+  rails.forEach(e=>{
+    s+='<line x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="#4a4432" stroke-width="7" stroke-linecap="round"/>';
+    s+='<line x1="'+e.x1+'" y1="'+e.y1+'" x2="'+e.x2+'" y2="'+e.y2+'" stroke="#e6dcb4" stroke-width="1.6" stroke-dasharray="7 6"/>';
+  });
+  /* nodes */
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const t=cellType(r,c), x=nodeX(c), y=nodeY(r);
+    if(t==='camp'){
+      s+='<circle cx="'+x+'" cy="'+y+'" r="19" fill="rgba(95,133,71,.85)" stroke="#3c5a2a" stroke-width="2.5"/>';
+      s+='<circle cx="'+x+'" cy="'+y+'" r="13" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.4" stroke-dasharray="3 4"/>';
+    } else if(t==='hq'){
+      s+='<rect x="'+(x-26)+'" y="'+(y-19)+'" width="52" height="38" rx="9" fill="rgba(138,58,50,.9)" stroke="#5c2019" stroke-width="2.5"/>';
+      s+='<rect x="'+(x-21)+'" y="'+(y-14)+'" width="42" height="28" rx="6" fill="none" stroke="rgba(255,220,150,.4)" stroke-width="1.3"/>';
+    } else {
+      s+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="#5b5338"/>';
+    }
+  }
+  s+='</svg>';
+
+  /* --- river --- */
+  const wavePath=(amp,ph)=>{
+    let d='M0 '+(20+ph);
+    for(let x=0;x<=BOARD_W*2;x+=40){
+      d+=' q20 '+(-amp)+' 40 0';
+    }
+    d+=' V'+RIVER_H+' H0 Z';
+    return d;
+  };
+  let river='<div class="river" style="top:'+RIVER_TOP+'px;height:'+RIVER_H+'px;">';
+  river+='<div class="bank top"></div><div class="bank bot"></div>';
+  river+='<svg class="wave w1" viewBox="0 0 '+(BOARD_W*2)+' '+RIVER_H+'" preserveAspectRatio="none"><path d="'+wavePath(8,4)+'" fill="rgba(200,235,255,.5)"/></svg>';
+  river+='<svg class="wave w2" viewBox="0 0 '+(BOARD_W*2)+' '+RIVER_H+'" preserveAspectRatio="none"><path d="'+wavePath(6,14)+'" fill="rgba(120,190,220,.5)"/></svg>';
+  river+='<svg class="wave w3" viewBox="0 0 '+(BOARD_W*2)+' '+RIVER_H+'" preserveAspectRatio="none"><path d="'+wavePath(7,26)+'" fill="rgba(30,80,110,.55)"/></svg>';
+  /* glints */
+  [[40,22,3.2,0],[150,38,4.1,.8],[250,26,2.7,1.6],[95,50,3.6,.4],[210,55,4.5,1.1]].forEach(([x,y,dur,del])=>{
+    river+='<div class="glint" style="left:'+x+'px;top:'+y+'px;width:'+(12+x%10)+'px;animation-duration:'+dur+'s;animation-delay:'+del+'s;"></div>';
+  });
+  /* fish */
+  const fishSvg='<svg viewBox="0 0 26 12"><ellipse cx="11" cy="6" rx="9" ry="4" fill="rgba(20,45,60,.7)"/><path d="M19 6 L26 1.5 L24 6 L26 10.5 Z" fill="rgba(20,45,60,.7)"/><circle cx="6" cy="5" r="1" fill="rgba(200,230,240,.8)"/></svg>';
+  river+='<div class="fish" style="top:30px;animation-duration:26s;">'+fishSvg+'</div>';
+  river+='<div class="fish" style="top:48px;animation-duration:34s;animation-delay:-14s;">'+fishSvg+'</div>';
+  /* bridges */
+  BRIDGE_COLS.forEach(c=>{
+    river+='<div class="bridge" style="left:'+(nodeX(c)-21)+'px;"></div>';
+  });
+  river+='</div>';
+
+  boardEl.innerHTML=s+river+'<div id="cellLayer"></div>';
+}
+
+/* ================= RENDER ================= */
+function render(){
+  const bd = replayMode ? replayBoard : board;
+  const layer=document.getElementById('cellLayer');
+  layer.innerHTML='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const div=document.createElement('div');
+      div.className='cell';
+      div.style.left=(c*CW)+'px';
+      div.style.top=(nodeY(r)-CH/2)+'px';
+      div.style.width=CW+'px';
+      div.style.height=CH+'px';
+      if(selected&&selected.r===r&&selected.c===c) div.classList.add('selected');
+      const legal=currentLegalMoves.some(m=>m[0]===r&&m[1]===c);
+      if(legal){
+        div.classList.add('legal');
+        if(phase==='play'&&bd[idx(r,c)]) div.classList.add('attack');
+      }
+      if((phase==='play'||replayMode)&&lastMove&&((lastMove.fromR===r&&lastMove.fromC===c)||(lastMove.toR===r&&lastMove.toC===c)))
+        div.classList.add('lastmove');
+      const p=bd[idx(r,c)];
+      if(p){
+        const pd=document.createElement('div');
+        const visible=pieceVisible(p);
+        pd.className='piece '+p.owner
+          +(visible?'':' back')
+          +(visible&&p.type==='flag'?' flagpiece':'');
+        pd.innerHTML = visible
+          ? EMBLEMS[p.type]+'<span class="lbl">'+p.lbl+'</span>'
+          : EMBLEMS.unknown+'<span class="lbl">?</span>';
+        pd.title = visible ? p.name+(p.rank>0?' (rank '+p.rank+')':'') : 'Unknown enemy piece';
+        /* slide-in animation for the piece that just moved — play it only once */
+        if(lastMove&&!lastMove.animated&&lastMove.toR===r&&lastMove.toC===c&&bd[idx(r,c)]===p&&!p.static){
+          lastMove.animated=true;
+          const dx=nodeX(lastMove.fromC)-nodeX(lastMove.toC);
+          const dy=nodeY(lastMove.fromR)-nodeY(lastMove.toR);
+          pd.style.transform='translate('+dx+'px,'+dy+'px)';
+          pd.style.zIndex=10;
+          requestAnimationFrame(()=>requestAnimationFrame(()=>{
+            pd.style.transition='transform .3s cubic-bezier(.3,1.1,.5,1)';
+            pd.style.transform='';
+          }));
+        }
+        div.appendChild(pd);
+      }
+      div.addEventListener('click',()=>onCellClick(r,c));
+      layer.appendChild(div);
+    }
+  }
+  const banner=document.getElementById('turnBanner');
+  if(replayMode){
+    banner.className='turn-banner over';
+    document.getElementById('turnText').textContent='Replay — move '+(replayRecIndex>=0?records[replayRecIndex].n:0)+' of '+moveCount+(replayPaused?' (paused)':'');
+  } else if(phase==='setup'){
+    banner.className='turn-banner '+setupSide;
+    document.getElementById('turnText').textContent = sideName(setupSide)+' — arrange your pieces';
+  } else {
+    banner.className='turn-banner '+(gameOver?'over':currentTurn);
+    document.getElementById('turnText').textContent = gameOver ? 'Game over' : sideName(currentTurn)+' to move';
+  }
+  document.getElementById('shuffleBtn').style.display = phase==='setup' ? '' : 'none';
+  document.getElementById('startBtn').style.display = phase==='setup' ? '' : 'none';
+  document.getElementById('replayBtn').style.display = (gameOver&&!replayMode) ? '' : 'none';
+  document.getElementById('replayPauseBtn').style.display = replayMode ? '' : 'none';
+  document.getElementById('replayPauseBtn').textContent = replayPaused ? '▶ Resume' : '⏸ Pause';
+  document.getElementById('replayStepBtn').style.display = replayMode ? '' : 'none';
+  document.getElementById('replayExitBtn').style.display = replayMode ? '' : 'none';
+  /* captured pieces: you always know your own losses; enemy losses stay face-down until game over */
+  const chipVisible=p=>gameOver||replayMode||revealEnemy||p.owner===currentViewer();
+  const chip=p=>chipVisible(p)
+    ? '<span class="chip '+p.owner+'">'+EMBLEMS[p.type]+p.lbl+'</span>'
+    : '<span class="chip '+p.owner+'">'+EMBLEMS.unknown+'?</span>';
+  document.getElementById('capturedS').innerHTML=capturedS.map(chip).join('');
+  document.getElementById('capturedN').innerHTML=capturedN.map(chip).join('');
+}
+
+/* ================= RULES MODAL RANK TABLE ================= */
+function buildRankTable(){
+  const rows=[
+    ['marshal','Field Marshal','9','One only — the strongest fighter.'],
+    ['general','General','8',''],
+    ['ltgeneral','Lt. General','7','×2'],
+    ['brigadier','Brigadier','6','×2'],
+    ['colonel','Colonel','5','×2'],
+    ['major','Major','4','×2'],
+    ['captain','Captain','3','×3'],
+    ['lieutenant','Lieutenant','2','×3'],
+    ['engineer','Engineer','1','×3 — defuses mines, turns on railways'],
+    ['bomb','Bomb','—','×2 — mutual destruction with anything'],
+    ['mine','Landmine','—','×3 — immobile trap in the back two rows'],
+    ['flag','Flag','—','Immobile; capture it to win']
+  ];
+  document.getElementById('rankTable').innerHTML=rows.map(([id,name,rank,note])=>
+    '<tr><td class="emcell">'+EMBLEMS[id]+'</td><td><b>'+name+'</b></td><td>'+(rank!=='—'?'Rank '+rank:'—')+'</td><td>'+note+'</td></tr>'
+  ).join('');
+}
+
+/* ================= WIRE-UP ================= */
+function newGame(){
+  stopReplayTimer();
+  replayMode=false; replayBoard=null; replayRecIndex=-1; replayPaused=false;
+  initialSnapshot=null;
+  setupBoard();
+  selected=null; currentLegalMoves=[]; currentTurn='S'; gameOver=false; lastMove=null;
+  phase='setup'; setupSide='S';
+  capturedS=[]; capturedN=[]; records=[]; moveCount=0;
+  document.getElementById('log').innerHTML='';
+  document.getElementById('passOverlay').classList.add('hidden-el');
+  document.getElementById('winOverlay').classList.add('hidden-el');
+  addLog('New game. Arrange your pieces, then press Start Battle.');
+  render();
+}
+
+document.getElementById('newGameBtn').addEventListener('click',newGame);
+document.getElementById('winNewBtn').addEventListener('click',newGame);
+document.getElementById('shuffleBtn').addEventListener('click',()=>{
+  if(phase!=='setup') return;
+  shuffleSide(setupSide);
+  selected=null; currentLegalMoves=[];
+  render();
+});
+document.getElementById('startBtn').addEventListener('click',startBattle);
+document.getElementById('revealBtn').addEventListener('click',e=>{
+  revealEnemy=!revealEnemy;
+  e.target.textContent='Reveal Enemy (debug): '+(revealEnemy?'On':'Off');
+  renderLog();
+  render();
+});
+document.getElementById('passReadyBtn').addEventListener('click',()=>{
+  document.getElementById('passOverlay').classList.add('hidden-el');
+  render();
+});
+document.getElementById('aiBtn').addEventListener('click',e=>{
+  aiEnabled=!aiEnabled;
+  e.target.textContent='AI Opponent: '+(aiEnabled?'On':'Off');
+  document.getElementById('passOverlay').classList.add('hidden-el');
+  if(aiEnabled && phase==='play' && currentTurn==='N' && !gameOver) setTimeout(aiTurn,400);
+  render();
+});
+document.getElementById('copyLogBtn').addEventListener('click',()=>{
+  const full=gameOver||replayMode||revealEnemy;
+  const text=records.map(rec=>rec.kind==='sys'?'· '+rec.text:(full?fullText(rec):redactedText(rec))).join('\n');
+  navigator.clipboard.writeText(text);
+});
+document.getElementById('replayBtn').addEventListener('click',enterReplay);
+document.getElementById('winReplayBtn').addEventListener('click',enterReplay);
+document.getElementById('winViewBtn').addEventListener('click',()=>{
+  document.getElementById('winOverlay').classList.add('hidden-el');
+  renderLog(); render();
+});
+document.getElementById('replayPauseBtn').addEventListener('click',()=>{
+  replayPaused=!replayPaused;
+  render();
+});
+document.getElementById('replayStepBtn').addEventListener('click',()=>{
+  replayPaused=true;
+  replayStepOnce();
+});
+document.getElementById('replayExitBtn').addEventListener('click',exitReplay);
+document.getElementById('rulesBtn').addEventListener('click',()=>{
+  document.getElementById('rulesModal').classList.remove('hidden-el');
+});
+document.getElementById('rulesCloseBtn').addEventListener('click',()=>{
+  document.getElementById('rulesModal').classList.add('hidden-el');
+});
+document.getElementById('rulesModal').addEventListener('click',e=>{
+  if(e.target.id==='rulesModal') e.target.classList.add('hidden-el');
+});
+
+revealEnemy=false;
+aiEnabled=false;
+buildBoardScenery();
+buildRankTable();
+newGame();
+</script>
+</body>
+</html>

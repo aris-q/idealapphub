@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#141810"/>
+  <rect x="170" y="30" width="300" height="270" rx="8" fill="#cfc39a" stroke="#5b5338" stroke-width="4"/>
+  <g stroke="#6b6244" stroke-width="2" fill="none">
+    <path d="M200 60 H440 M200 105 H440 M200 195 H440 M200 240 H440 M200 60 V240 M260 60 V240 M320 60 V240 M380 60 V240 M440 60 V240"/>
+  </g>
+  <rect x="170" y="140" width="300" height="34" fill="#3f7fa0" stroke="#9b8b5c" stroke-width="3"/>
+  <path d="M175 150 q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#7fb2c9" stroke-width="3" opacity=".8"/>
+  <rect x="250" y="134" width="26" height="46" fill="#96733f" stroke="#5c4425" stroke-width="3"/>
+  <rect x="364" y="134" width="26" height="46" fill="#96733f" stroke="#5c4425" stroke-width="3"/>
+  <circle cx="320" cy="82" r="16" fill="#5f8547" stroke="#3c5a2a" stroke-width="2.5"/>
+  <circle cx="320" cy="218" r="16" fill="#5f8547" stroke="#3c5a2a" stroke-width="2.5"/>
+  <rect x="228" y="52" width="64" height="38" rx="6" fill="#3c74a6" stroke="#274f75" stroke-width="2"/>
+  <text x="260" y="76" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e4f0ff" text-anchor="middle">?</text>
+  <rect x="348" y="210" width="64" height="38" rx="6" fill="#b8463a" stroke="#7c281f" stroke-width="2"/>
+  <text x="380" y="230" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#ffe7c4" text-anchor="middle">★ ★ ★</text>
+  <text x="380" y="242" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#ffe7c4" text-anchor="middle" letter-spacing="1">MARSHAL</text>
+  <text x="320" y="338" font-family="Arial, sans-serif" font-size="24" font-weight="900" letter-spacing="6" fill="#d4ab35" text-anchor="middle">FIELD CHESS</text>
+</svg>
