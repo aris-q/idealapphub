@@ -1,0 +1,447 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Stock.AI — TradeAI Demo</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #c8f135;
+    --accent2: #7c6af7;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --up: #4ade80;
+    --down: #f87171;
+    --warn: #fbbf24;
+    --display: "Syne", "Futura", "Avenir Next", "Trebuchet MS", ui-sans-serif, sans-serif;
+    --mono: "DM Mono", ui-monospace, "Cascadia Mono", Consolas, "SF Mono", monospace;
+  }
+  /* The product is a dark terminal — the demo commits to the same single theme */
+  :root[data-theme="light"] { --bg:#0a0a0f; --surface:#111118; --surface2:#1a1a24; --border:#2a2a3a; --text:#e8e8f0; --muted:#6b6b80; }
+
+  html { background: var(--bg); }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* HEADER */
+  .header {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    padding: 26px 0 18px; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .logo { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -0.5px; }
+  .logo .dot { color: var(--accent); }
+  .demo-badge {
+    font-size: 10px; letter-spacing: 2px; color: var(--bg);
+    background: var(--accent); border-radius: 4px; padding: 3px 10px; font-weight: 700;
+    vertical-align: middle; margin-left: 10px;
+  }
+  .header-sub { color: var(--muted); font-size: 12px; }
+
+  /* INTRO */
+  .intro { padding: 34px 0 8px; max-width: 68ch; }
+  .intro h1 {
+    font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1.2;
+    letter-spacing: -0.5px; text-wrap: balance; margin-bottom: 12px;
+  }
+  .intro h1 em { font-style: normal; color: var(--accent); }
+  .intro p { color: var(--muted); font-size: 13px; }
+
+  /* STAT STRIP */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px; background: var(--border); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin: 28px 0 44px;
+  }
+  .stat { background: var(--surface); padding: 14px 18px; }
+  .stat .k { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+  .stat .v { font-family: var(--display); font-weight: 700; font-size: 22px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .stat .v small { font-size: 12px; color: var(--muted); font-family: var(--mono); font-weight: 400; }
+
+  /* SECTION HEADINGS */
+  .sec { margin-top: 56px; }
+  .sec-eyebrow { font-size: 10px; letter-spacing: 2.5px; color: var(--accent); text-transform: uppercase; }
+  .sec h2 { font-family: var(--display); font-weight: 700; font-size: 21px; margin: 4px 0 6px; letter-spacing: -0.3px; }
+  .sec-sub { color: var(--muted); font-size: 12px; max-width: 68ch; margin-bottom: 18px; }
+
+  /* TABS */
+  .tabbar { display: flex; gap: 4px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .tab {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; color: var(--muted);
+    background: none; border: none; border-bottom: 2px solid transparent;
+    padding: 10px 16px; cursor: pointer;
+  }
+  .tab:hover { color: var(--text); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .panel { display: none; padding-top: 20px; }
+  .panel.active { display: block; }
+
+  /* CARDS + TABLES */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .card-title { font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: 0.3px; }
+  .card-sub { color: var(--muted); font-size: 11px; }
+  .btn {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--text);
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 14px; cursor: pointer;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.primary { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+
+  .tscroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th {
+    font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase;
+    text-align: right; padding: 10px 14px; border-bottom: 1px solid var(--border);
+    font-weight: 500; white-space: nowrap;
+  }
+  th:first-child, td:first-child { text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent); text-align: right; white-space: nowrap; font-size: 12px; }
+  tr:last-child td { border-bottom: none; }
+  .tk { font-family: var(--display); font-weight: 700; font-size: 14px; }
+  .up { color: var(--up); }
+  .down { color: var(--down); }
+  .muted { color: var(--muted); }
+  td.flash { animation: flash 0.9s ease-out; }
+  @keyframes flash { 0% { background: color-mix(in srgb, var(--accent) 22%, transparent); } 100% { background: transparent; } }
+  @media (prefers-reduced-motion: reduce) { td.flash { animation: none; } }
+
+  .sumbar {
+    display: flex; gap: 32px; padding: 14px 18px; border-top: 1px solid var(--border);
+    flex-wrap: wrap; background: var(--surface2);
+  }
+  .sumbar .k { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+  .sumbar .v { font-family: var(--display); font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+
+  /* PILLS */
+  .pill {
+    display: inline-block; font-size: 10px; padding: 2px 9px; border-radius: 4px;
+    font-weight: 700; letter-spacing: 0.5px;
+  }
+  .pill.sell-only { background: color-mix(in srgb, var(--accent2) 18%, transparent); color: #b0a5fb; border: 1px solid color-mix(in srgb, var(--accent2) 40%, transparent); }
+  .pill.full { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+  .pill.heavy { background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent); }
+  .pill.ok { background: color-mix(in srgb, var(--up) 12%, transparent); color: var(--up); border: 1px solid color-mix(in srgb, var(--up) 30%, transparent); }
+
+  /* TIMELINE */
+  .timeline { padding: 6px 0; }
+  .slot {
+    display: grid; grid-template-columns: 84px 1fr auto; gap: 14px; align-items: baseline;
+    padding: 10px 18px; border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  }
+  .slot:last-child { border-bottom: none; }
+  .slot .t { font-family: var(--mono); color: var(--accent); font-size: 12px; }
+  .slot .what { font-size: 12px; }
+  .slot .why { color: var(--muted); font-size: 11px; display: block; }
+
+  /* STOP RULES */
+  .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .rule { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .rule.new { border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+  .rule .thresh { font-family: var(--display); font-weight: 800; font-size: 26px; color: var(--down); font-variant-numeric: tabular-nums; }
+  .rule .name { font-size: 12px; font-weight: 700; margin: 2px 0 6px; letter-spacing: 0.3px; }
+  .rule .desc { color: var(--muted); font-size: 11px; }
+  .rule .tag { float: right; font-size: 9px; letter-spacing: 1.5px; color: var(--bg); background: var(--accent); border-radius: 3px; padding: 2px 7px; font-weight: 700; }
+
+  /* PIPELINE */
+  .pipe { display: flex; gap: 10px; align-items: stretch; overflow-x: auto; padding-bottom: 6px; }
+  .stage {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; min-width: 150px; flex: 1;
+  }
+  .stage .n { font-family: var(--display); font-weight: 700; font-size: 13px; }
+  .stage .d { color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .stage .dur { color: var(--accent); font-size: 11px; margin-top: 8px; }
+  .arrow { align-self: center; color: var(--muted); flex: 0 0 auto; }
+
+  /* ADMIN MOCK */
+  .admin-row {
+    display: flex; justify-content: space-between; gap: 14px; align-items: center;
+    padding: 13px 18px; border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+    flex-wrap: wrap;
+  }
+  .admin-row:last-child { border-bottom: none; }
+  .admin-label { font-size: 12px; font-weight: 700; }
+  .admin-desc { color: var(--muted); font-size: 11px; max-width: 56ch; }
+  .mock-input {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: var(--mono); font-size: 11px; padding: 4px 8px; width: 80px;
+  }
+  .warnbtn { border-color: color-mix(in srgb, var(--warn) 50%, var(--border)); color: var(--warn); }
+
+  footer { margin-top: 64px; border-top: 1px solid var(--border); padding-top: 18px; color: var(--muted); font-size: 11px; max-width: 72ch; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--accent); color: var(--accent);
+    border-radius: 8px; padding: 8px 18px; font-size: 12px; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+
+<div class="wrap">
+  <div class="header">
+    <div class="logo">STOCK<span class="dot">.</span>AI <span class="demo-badge">DEMO</span></div>
+    <div class="header-sub">AI paper-trading simulation · data snapshot Jul 10, 2026 · 1:20 PM ET</div>
+  </div>
+
+  <div class="intro">
+    <h1>A self-driving <em>$100k paper portfolio</em> — scanned, scored, and stop-guarded on a market-day clock.</h1>
+    <p>Stock.AI sweeps ~700 tickers daily, has Gemini score a 20-name shortlist, and trades a simulated account
+       with four layered stop-losses. A built-in scheduler runs light sell-only checks all morning and the full
+       pipeline each afternoon — no button-pressing required.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Dream scan universe</div><div class="v">689 <small>tickers</small></div></div>
+    <div class="stat"><div class="k">AI shortlist</div><div class="v">20 <small>scored / day</small></div></div>
+    <div class="stat"><div class="k">Gemini budget</div><div class="v">~20 <small>calls / day</small></div></div>
+    <div class="stat"><div class="k">Stop-loss layers</div><div class="v">4 <small>incl. daily-drop</small></div></div>
+    <div class="stat"><div class="k">Morning sell checks</div><div class="v">5<small>× before noon</small></div></div>
+  </div>
+
+  <!-- APP TOUR -->
+  <div class="sec">
+    <div class="sec-eyebrow">Interactive tour</div>
+    <h2>The four surfaces</h2>
+    <p class="sec-sub">A working mock of the app's tabs, populated with the real July 10 snapshot. Try the refresh button on the account.</p>
+
+    <div class="tabbar" role="tablist">
+      <button class="tab active" role="tab" aria-selected="true" data-panel="p-account">🤖 TRADEAI ACCOUNT</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-sched">⏰ SCHEDULE</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-dream">✨ DREAM SCAN</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="p-admin">⚙ ADMIN</button>
+    </div>
+
+    <!-- ACCOUNT PANEL -->
+    <div class="panel active" id="p-account">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">TRADEAI ACCOUNT</div>
+            <div class="card-sub">AI-driven simulation · separate $100k account · prices <span id="asOf">1:20 PM ET</span></div>
+          </div>
+          <button class="btn primary" id="refreshBtn">↻ REFRESH PRICES</button>
+        </div>
+        <div class="tscroll">
+          <table id="holdTable">
+            <thead><tr>
+              <th>Ticker</th><th>Shares</th><th>Purchase</th><th>Yest close</th><th>Current</th><th>Today %</th><th>Gain/Loss</th><th>%</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="sumbar">
+          <div><div class="k">Cash balance</div><div class="v">$1.06</div></div>
+          <div><div class="k">Portfolio value</div><div class="v" id="pv">—</div></div>
+          <div><div class="k">Total P&amp;L</div><div class="v" id="pl">—</div></div>
+        </div>
+      </div>
+      <p class="card-sub" style="margin-top:10px">TODAY % is live price vs yesterday's official close — the signal that feeds the
+      daily-drop stop. The scheduler refreshes it every 20 minutes all morning; the button refreshes it on demand (~6 Yahoo calls, ≈2s).</p>
+    </div>
+
+    <!-- SCHEDULE PANEL -->
+    <div class="panel" id="p-sched">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">MARKET-DAY SCHEDULE</div>
+            <div class="card-sub">All times US-Eastern · weekends, NYSE holidays &amp; early closes skipped · times editable in Admin</div>
+          </div>
+          <span class="pill ok">ENABLED</span>
+        </div>
+        <div class="timeline">
+          <div class="slot"><span class="t">9:40 AM</span><span class="what">Sell-only stop check <span class="why">…then 10:20, 10:40, 11:20, 11:40 — holdings prices refreshed, four stops evaluated, zero buys, zero Gemini</span></span><span class="pill sell-only">SELL-ONLY</span></div>
+          <div class="slot"><span class="t">10:00 AM</span><span class="what">Full Recommend <span class="why">sells + buys from cached AI scores · again at 11:00</span></span><span class="pill full">TRADE</span></div>
+          <div class="slot"><span class="t">1:30 PM</span><span class="what">Price refresh + Dream scan <span class="why">~75 min sweep of 689 tickers — skipped if a scan ran &lt;3h ago</span></span><span class="pill heavy">HEAVY</span></div>
+          <div class="slot"><span class="t">3:00 PM</span><span class="what">Identify → Fetch → Analyze → Recommend <span class="why">Analyze skipped if it already ran today · Recommend lands ~3:15, on fresh afternoon prices, before the 4:00 close</span></span><span class="pill full">TRADE</span></div>
+        </div>
+      </div>
+      <p class="card-sub" style="margin-top:10px">Why this shape: mornings are the noisiest window, so they get protection without new entries;
+      buys happen in the afternoon, when the day's move is ~90% baked into the signals.</p>
+    </div>
+
+    <!-- DREAM PANEL -->
+    <div class="panel" id="p-dream">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">DREAM SCAN → 3-BUCKET SHORTLIST</div>
+            <div class="card-sub">689 scored this morning · top 20 split across strategies</div>
+          </div>
+          <span class="card-sub">scanned 9:43–10:57 AM</span>
+        </div>
+        <div class="tscroll">
+          <table>
+            <thead><tr><th>Bucket</th><th>Picks</th><th>What it hunts</th><th>Example signals</th></tr></thead>
+            <tbody>
+              <tr><td class="tk">Momentum</td><td>7</td><td class="muted" style="text-align:right">Names already moving with volume behind them</td><td class="muted" style="text-align:right">volume ratio &gt; 1.9 · RSI 50–65</td></tr>
+              <tr><td class="tk">Reversal</td><td>7</td><td class="muted" style="text-align:right">Oversold quality poised to bounce</td><td class="muted" style="text-align:right">RSI &lt; 30 · lower Bollinger touch</td></tr>
+              <tr><td class="tk">SmartMoney</td><td>6</td><td class="muted" style="text-align:right">Insider buys &amp; institutional accumulation</td><td class="muted" style="text-align:right">insider purchases · inst. % rising</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="card-sub" style="margin-top:10px">Each shortlisted name then gets a Gemini assessment (score, signal, trajectory, reasoning),
+      blended with dream score, technicals, news and sector-diversity penalties into a 0–100 composite. Top composites fill up to 6 slots.</p>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="panel" id="p-admin">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">SCHEDULER — EDITABLE TIMES</div>
+            <div class="card-sub">Saved to config, picked up within 20 seconds — no restart</div>
+          </div>
+          <button class="btn">SAVE TIMES</button>
+        </div>
+        <div class="admin-row">
+          <div><div class="admin-label">Sell-only checks</div><div class="admin-desc">hours × minutes, market-open only</div></div>
+          <div><input class="mock-input" value="9,10,11" aria-label="hours"> : <input class="mock-input" value="20,40" style="width:60px" aria-label="minutes"></div>
+        </div>
+        <div class="admin-row">
+          <div><div class="admin-label">Full Recommend</div><div class="admin-desc">sells + buys</div></div>
+          <input class="mock-input" style="width:110px" value="10:00, 11:00" aria-label="recommend times">
+        </div>
+        <div class="admin-row">
+          <div><div class="admin-label">Dream scan</div><div class="admin-desc">price refresh + 75-min sweep</div></div>
+          <input class="mock-input" value="13:30" aria-label="dream time">
+        </div>
+        <div class="admin-row">
+          <div><div class="admin-label">Afternoon chain</div><div class="admin-desc">Identify → Fetch → Analyze → Recommend</div></div>
+          <input class="mock-input" value="15:00" aria-label="chain time">
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-head"><div><div class="card-title">PER-FILE PURGE</div><div class="card-sub">Each data store purges independently, dated before a chosen day</div></div></div>
+        <div class="admin-row"><div><div class="admin-label" style="color:var(--warn)">🗑 Transactions <span class="muted">(trades_ai.json)</span></div><div class="admin-desc">Buy/sell log of the simulation. Holdings and balance are kept.</div></div><button class="btn warnbtn">PURGE</button></div>
+        <div class="admin-row"><div><div class="admin-label" style="color:var(--warn)">🗑 Closed-trade outcomes <span class="muted">(trade_outcomes.json)</span></div><div class="admin-desc">Gain/loss %, SPY benchmark and buy-time factors — the scoring feedback loop.</div></div><button class="btn warnbtn">PURGE</button></div>
+        <div class="admin-row"><div><div class="admin-label" style="color:var(--warn)">🗑 Shadow snapshots <span class="muted">(shadow_candidates.json)</span></div><div class="admin-desc">Every scored candidate, graded against 5-day forward returns.</div></div><button class="btn warnbtn">PURGE</button></div>
+        <div class="admin-row"><div><div class="admin-label" style="color:var(--warn)">🗑 Signal forecasts <span class="muted">(signal_forecasts.json)</span></div><div class="admin-desc">Daily price-forecast ranges and their hit/miss grades.</div></div><button class="btn warnbtn">PURGE</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STOP RULES -->
+  <div class="sec">
+    <div class="sec-eyebrow">Risk engine</div>
+    <h2>Four layered stops on every position</h2>
+    <p class="sec-sub">Checked five times each morning and at every Recommend. First match wins; all fills modeled with liquidity-aware slippage.</p>
+    <div class="rules">
+      <div class="rule"><div class="thresh">−8%</div><div class="name">Hard stop</div><div class="desc">vs purchase price. Unconditional exit — no score can save it.</div></div>
+      <div class="rule new"><span class="tag">NEW</span><div class="thresh">−8%</div><div class="name">Daily-drop stop</div><div class="desc">vs yesterday's close. Catches a single-day collapse the purchase-price stops can't see — even on a position still in profit.</div></div>
+      <div class="rule"><div class="thresh">−6%</div><div class="name">Soft stop</div><div class="desc">vs purchase, only when the AI composite has also fallen below 50/100.</div></div>
+      <div class="rule"><div class="thresh">−10%</div><div class="name">Trailing stop</div><div class="desc">vs peak since purchase, once in profit — locks in gains on a fade.</div></div>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="sec">
+    <div class="sec-eyebrow">Daily pipeline</div>
+    <h2>From 689 tickers to an executed trade</h2>
+    <p class="sec-sub">Measured stage timings from the July 10 run. Heavy data work happens early; the trading decision waits for fresh 3 PM prices.</p>
+    <div class="pipe">
+      <div class="stage"><div class="n">Dream Scan</div><div class="d">689 tickers scored on fundamentals + technicals</div><div class="dur">~75 min</div></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="n">Identify</div><div class="d">3-bucket shortlist of 20</div><div class="dur">&lt;1 min</div></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="n">Fetch</div><div class="d">Deep detail on ~95 tickers</div><div class="dur">~20 s</div></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="n">AI Analyze</div><div class="d">Gemini scores 20 names · skipped if already run today</div><div class="dur">~13 min</div></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="n">Recommend</div><div class="d">Composite ranking → stops → buys with slippage</div><div class="dur">seconds</div></div>
+    </div>
+  </div>
+
+  <footer>
+    Stock.AI is a paper-trading simulation for research — no real orders are placed and nothing here is investment
+    advice. Data sources: Yahoo Finance (prices, fundamentals), Google Gemini (assessments), FRED (macro).
+    Snapshot shown: July 10, 2026.
+  </footer>
+</div>
+
+<div class="toast" id="toast">Prices refreshed — 6 tickers, 2.2s</div>
+
+<script>
+  // ── Tabs ──
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active'); t.setAttribute('aria-selected','true');
+    document.getElementById(t.dataset.panel).classList.add('active');
+  }));
+
+  // ── Holdings (July 10 snapshot) ──
+  const HOLD = [
+    { tk:'BMNR', sh:1100, buy:15.04,  prev:14.69,  cur:15.06   },
+    { tk:'NBIS', sh:80,   buy:200.85, prev:216.20, cur:221.65  },
+    { tk:'CDE',  sh:1100, buy:14.94,  prev:16.02,  cur:16.015  },
+    { tk:'IRWD', sh:3800, buy:4.29,   prev:4.67,   cur:4.445   },
+    { tk:'ANGX', sh:4100, buy:3.98,   prev:3.96,   cur:3.881   },
+    { tk:'ONDS', sh:2200, buy:7.53,   prev:7.65,   cur:7.305   },
+  ];
+  const $ = v => '$' + v.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const pctCell = v => `<td class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${v.toFixed(2)}%</td>`;
+
+  function renderHoldings(flash) {
+    const tb = document.querySelector('#holdTable tbody');
+    let value = 0, cost = 0;
+    tb.innerHTML = HOLD.map(h => {
+      const day = (h.cur - h.prev) / h.prev * 100;
+      const gl  = (h.cur - h.buy) * h.sh;
+      const glp = (h.cur - h.buy) / h.buy * 100;
+      value += h.cur * h.sh; cost += h.buy * h.sh;
+      return `<tr>
+        <td class="tk">${h.tk}</td><td>${h.sh.toLocaleString()}</td>
+        <td class="muted">${$(h.buy)}</td><td class="muted">${$(h.prev)}</td>
+        <td${flash ? ' class="flash"' : ''}>${$(h.cur)}</td>
+        ${pctCell(day)}
+        <td class="${gl >= 0 ? 'up' : 'down'}">${$(gl)}</td>
+        ${pctCell(glp)}
+      </tr>`;
+    }).join('');
+    const pl = value - cost;
+    document.getElementById('pv').textContent = $(value);
+    const plEl = document.getElementById('pl');
+    plEl.textContent = (pl >= 0 ? '+' : '−') + $(Math.abs(pl)).slice(0);
+    plEl.className = 'v ' + (pl >= 0 ? 'up' : 'down');
+  }
+  renderHoldings(false);
+
+  // ── Simulated refresh: small live-tick jitter ──
+  const btn = document.getElementById('refreshBtn');
+  btn.addEventListener('click', () => {
+    btn.disabled = true; btn.textContent = '⏳ REFRESHING';
+    setTimeout(() => {
+      HOLD.forEach(h => { h.cur = +(h.cur * (1 + (Math.random() - 0.5) * 0.008)).toFixed(3); });
+      renderHoldings(true);
+      const now = new Date();
+      document.getElementById('asOf').textContent =
+        now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) + ' (demo)';
+      btn.disabled = false; btn.textContent = '↻ REFRESH PRICES';
+      const t = document.getElementById('toast');
+      t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1800);
+    }, 700);
+  });
+</script>

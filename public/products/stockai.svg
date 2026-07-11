@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#0a0a0f"/>
+  <g fill="none" stroke="#2a2a3a" stroke-width="1" opacity=".6">
+    <path d="M0 90 H640 M0 180 H640 M0 270 H640 M160 0 V360 M320 0 V360 M480 0 V360"/>
+  </g>
+  <rect x="60" y="60" width="520" height="200" rx="10" fill="#111118" stroke="#2a2a3a" stroke-width="2"/>
+  <path d="M90 220 L150 195 L210 205 L270 160 L330 175 L390 130 L450 145 L510 95 L550 105"
+        fill="none" stroke="#c8f135" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="550" cy="105" r="7" fill="#c8f135"/>
+  <g font-family="Consolas, 'DM Mono', monospace" font-size="13" fill="#6b6b80">
+    <text x="90" y="90">689 TICKERS / DAY</text>
+    <text x="90" y="112" fill="#7c6af7">AI SHORTLIST: 20</text>
+    <text x="90" y="134" fill="#4ade80">4 STOP LAYERS</text>
+  </g>
+  <rect x="440" y="76" width="120" height="26" rx="13" fill="#c8f135"/>
+  <text x="500" y="94" font-family="Consolas, monospace" font-size="13" font-weight="bold" fill="#0a0a0f" text-anchor="middle">DEMO</text>
+  <text x="320" y="316" font-family="'Trebuchet MS', sans-serif" font-size="30" font-weight="bold" letter-spacing="4" fill="#e8e8f0" text-anchor="middle">STOCK<tspan fill="#c8f135">.AI</tspan></text>
+</svg>
