@@ -20,7 +20,7 @@ export default function Hero() {
           Discover cutting-edge apps, stay updated with the latest news, and explore our growing product ecosystem.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          <a href="#products" style={{ padding: "10px 24px", background: "var(--accent)", color: "#060910", fontSize: 12, fontWeight: 700, borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>EXPLORE PRODUCTS</a>
+          <a href="/products" style={{ padding: "10px 24px", background: "var(--accent)", color: "#060910", fontSize: 12, fontWeight: 700, borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>EXPLORE PRODUCTS</a>
           <a href="#news" style={{ padding: "10px 24px", background: "transparent", color: "var(--accent)", fontSize: 12, border: "1px solid var(--accent)", borderRadius: 4, textDecoration: "none", letterSpacing: 1 }}>LATEST NEWS</a>
         </div>
       </div>
