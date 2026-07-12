@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import { auth, db } from "../../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { isAdmin } from "../../../lib/admins";
-import { collection, getDocs, addDoc, deleteDoc, doc, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 export default function AdminProducts() {
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({ name: "", description: "", link: "", videoUrl: "", image: "" });
+  const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const router = useRouter();
@@ -37,15 +38,23 @@ export default function AdminProducts() {
     setProducts(data);
   };
 
+  const emptyForm = { name: "", description: "", link: "", videoUrl: "", image: "" };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const payload = { ...form, image: form.image.trim() || null };
-      console.log("[PRODUCTS] Saving:", payload);
-      const docRef = await addDoc(collection(db, "products"), payload);
-      console.log("[PRODUCTS] Saved id:", docRef.id);
-      setForm({ name: "", description: "", link: "", videoUrl: "", image: "" });
+      const payload = { ...form, image: form.image.trim() || null, updatedAt: new Date().toISOString() };
+      if (editingId) {
+        console.log("[PRODUCTS] Updating id:", editingId, payload);
+        await updateDoc(doc(db, "products", editingId), payload);
+      } else {
+        console.log("[PRODUCTS] Saving:", payload);
+        const docRef = await addDoc(collection(db, "products"), payload);
+        console.log("[PRODUCTS] Saved id:", docRef.id);
+      }
+      setForm(emptyForm);
+      setEditingId(null);
       await fetchProducts();
     } catch (err) {
       console.error("[PRODUCTS] Save error:", err.message);
@@ -53,9 +62,27 @@ export default function AdminProducts() {
     setSaving(false);
   };
 
+  const handleEdit = (product) => {
+    setEditingId(product.id);
+    setForm({
+      name: product.name || "",
+      description: product.description || "",
+      link: product.link || "",
+      videoUrl: product.videoUrl || "",
+      image: product.image || "",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+  };
+
   const handleDelete = async (id) => {
     console.log("[PRODUCTS] Deleting id:", id);
     await deleteDoc(doc(db, "products", id));
+    if (id === editingId) handleCancelEdit();
     await fetchProducts();
   };
 
@@ -84,7 +111,9 @@ export default function AdminProducts() {
 
       <main style={{ padding: "40px 32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
         <div>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>New Product</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>
+            {editingId ? "Edit Product" : "New Product"}
+          </h2>
           <form onSubmit={handleSubmit}>
             <input style={inputStyle} placeholder="Product name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
             <textarea style={{ ...inputStyle, height: 80, resize: "none" }} placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
@@ -95,8 +124,13 @@ export default function AdminProducts() {
               <img src={form.image} alt="Preview" style={{ width: "100%", height: 100, objectFit: "cover", borderRadius: 4, marginBottom: 12, border: "1px solid #1a2a4a" }} />
             )}
             <button type="submit" disabled={saving} style={{ width: "100%", padding: "10px 24px", background: "#4af0ff", color: "#060910", fontSize: 12, fontWeight: 700, border: "none", borderRadius: 4, cursor: "pointer", letterSpacing: 1 }}>
-              {saving ? "SAVING..." : "ADD PRODUCT"}
+              {saving ? "SAVING..." : editingId ? "SAVE CHANGES" : "ADD PRODUCT"}
             </button>
+            {editingId && (
+              <button type="button" onClick={handleCancelEdit} style={{ width: "100%", marginTop: 8, padding: "10px 24px", background: "transparent", color: "#7a9cc8", fontSize: 12, border: "1px solid #1a2a4a", borderRadius: 4, cursor: "pointer", letterSpacing: 1 }}>
+                CANCEL EDIT
+              </button>
+            )}
           </form>
         </div>
 
@@ -109,7 +143,13 @@ export default function AdminProducts() {
               <h3 style={{ fontSize: 13, fontWeight: 600, color: "#e0e8ff", marginBottom: 4 }}>{product.name}</h3>
               <p style={{ fontSize: 11, color: "#7a9cc8", marginBottom: 8, lineHeight: 1.6 }}>{product.description}</p>
               {product.videoUrl && <p style={{ fontSize: 10, color: "#4af0ff", marginBottom: 8 }}>📹 Video linked</p>}
-              <button onClick={() => handleDelete(product.id)} style={{ fontSize: 10, padding: "4px 12px", border: "1px solid #ff4a4a", color: "#ff4a4a", background: "transparent", borderRadius: 4, cursor: "pointer" }}>DELETE</button>
+              {product.updatedAt && <p style={{ fontSize: 10, color: "#7a9cc8", marginBottom: 8 }}>Updated {new Date(product.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>}
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => handleEdit(product)} style={{ fontSize: 10, padding: "4px 12px", border: "1px solid #4af0ff", color: "#4af0ff", background: editingId === product.id ? "rgba(74,240,255,0.15)" : "transparent", borderRadius: 4, cursor: "pointer" }}>
+                  {editingId === product.id ? "EDITING..." : "EDIT"}
+                </button>
+                <button onClick={() => handleDelete(product.id)} style={{ fontSize: 10, padding: "4px 12px", border: "1px solid #ff4a4a", color: "#ff4a4a", background: "transparent", borderRadius: 4, cursor: "pointer" }}>DELETE</button>
+              </div>
             </div>
           ))}
         </div>
