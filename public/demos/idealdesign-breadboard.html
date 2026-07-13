@@ -1,0 +1,624 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>idealDesign — Requirement to Breadboard</title>
+<style>
+  :root {
+    --bg: #14181b; --bg-raised: #1b2024; --bg-panel: #20262b; --bg-input: #171b1e;
+    --border: #2e363c; --border-soft: #262d32;
+    --text: #eae7e0; --text-muted: #8d96a0; --text-faint: #5f6870;
+    --accent: #e0973f; --accent-strong: #f4b768; --accent-ink: #241505; --accent-tint: rgba(224,151,63,0.14);
+    --good: #5fb87c; --warn: #e0b23f; --critical: #e0663f;
+    --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --radius-sm: 4px; --radius-md: 8px;
+    --net-vcc: #e0663f; --net-gnd: #7d868f; --net-sig: #6f9cd6; --net-ctrl: #c98bd9;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f2f0ea; --bg-raised: #ffffff; --bg-panel: #fbf9f4; --bg-input: #ffffff;
+      --border: #ddd6c8; --border-soft: #e6e0d3;
+      --text: #201d18; --text-muted: #6b6f74; --text-faint: #9a9d9f;
+      --accent: #b5691e; --accent-strong: #8f5216; --accent-ink: #fff8ef; --accent-tint: rgba(181,105,30,0.1);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14181b; --bg-raised: #1b2024; --bg-panel: #20262b; --bg-input: #171b1e;
+    --border: #2e363c; --border-soft: #262d32;
+    --text: #eae7e0; --text-muted: #8d96a0; --text-faint: #5f6870;
+    --accent: #e0973f; --accent-strong: #f4b768; --accent-ink: #241505; --accent-tint: rgba(224,151,63,0.14);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg: #f2f0ea; --bg-raised: #ffffff; --bg-panel: #fbf9f4; --bg-input: #ffffff;
+    --border: #ddd6c8; --border-soft: #e6e0d3;
+    --text: #201d18; --text-muted: #6b6f74; --text-faint: #9a9d9f;
+    --accent: #b5691e; --accent-strong: #8f5216; --accent-ink: #fff8ef; --accent-tint: rgba(181,105,30,0.1);
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-display); font-size: 15px; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent-strong); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app { max-width: 1240px; margin: 0 auto; padding: 20px 24px 64px; display: flex; flex-direction: column; gap: 20px; }
+
+  .topbar-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .brand-mark { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-strong); }
+  h1 { margin: 6px 0 4px; font-weight: 700; font-size: 2rem; letter-spacing: -0.02em; text-wrap: balance; }
+  .tagline { margin: 0; color: var(--text-muted); font-size: 0.9375rem; max-width: 60ch; }
+  .preview-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-raised); font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+  .preview-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); }
+
+  /* ---- requirement box ---- */
+  .req-panel { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .req-row { display: flex; gap: 10px; align-items: flex-start; }
+  .req-row textarea {
+    flex: 1; resize: vertical; min-height: 52px; background: var(--bg-input); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.9375rem;
+    font-family: var(--font-display); line-height: 1.4;
+  }
+  .req-row button {
+    background: var(--accent); color: var(--accent-ink); border: none; padding: 12px 20px;
+    border-radius: var(--radius-sm); font-weight: 700; font-size: 0.875rem; cursor: pointer; white-space: nowrap;
+    transition: filter 0.12s ease;
+  }
+  .req-row button:hover { filter: brightness(1.08); }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .examples span.lbl { font-size: 0.75rem; color: var(--text-faint); margin-right: 2px; }
+  .example-chip {
+    border: 1px solid var(--border); background: var(--bg-raised); border-radius: 999px; padding: 5px 11px;
+    font-size: 0.78rem; cursor: pointer; color: var(--text-muted); transition: border-color 0.12s ease, color 0.12s ease;
+  }
+  .example-chip:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ---- interpreted summary ---- */
+  .interpret {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-sm);
+    background: var(--accent-tint); border-left: 3px solid var(--accent); font-size: 0.85rem;
+  }
+  .interpret .tag { font-family: var(--font-mono); font-weight: 700; color: var(--accent-strong); }
+  .interpret.unknown { border-left-color: var(--text-faint); background: var(--bg-raised); color: var(--text-muted); }
+
+  /* ---- results layout ---- */
+  .results { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); gap: 16px; }
+  @media (max-width: 940px) { .results { grid-template-columns: 1fr; } }
+
+  .board-panel { padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .board-panel h2, .side-panel h2 { margin: 0; font-size: 1rem; }
+  .board-scroll { overflow-x: auto; background: var(--bg-input); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 8px; }
+  .board-scroll svg { display: block; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 0.72rem; color: var(--text-muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend .sw { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  .steps { margin: 0; padding-left: 20px; font-size: 0.83rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
+  .steps li::marker { color: var(--accent-strong); font-family: var(--font-mono); }
+
+  .side-panel { padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  table.bom { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+  table.bom th { text-align: left; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); padding: 0 6px 6px; font-weight: 500; }
+  table.bom td { padding: 6px; border-top: 1px solid var(--border-soft); }
+  table.bom td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+  .bom-total { display: flex; justify-content: space-between; font-size: 0.85rem; padding-top: 8px; border-top: 1px solid var(--border); font-family: var(--font-mono); }
+
+  details.formula { font-size: 0.8rem; color: var(--text-muted); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--bg-raised); }
+  details.formula summary { cursor: pointer; padding: 8px 10px; font-weight: 600; color: var(--text); }
+  details.formula .formula-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 0.78rem; }
+  .formula-note { font-family: var(--font-display) !important; color: var(--text-faint); font-size: 0.75rem !important; }
+
+  .caveat { font-size: 0.72rem; color: var(--text-faint); border-top: 1px dashed var(--border-soft); padding-top: 8px; }
+
+  .gap-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-raised); overflow: hidden; }
+  .gap-cell { padding: 10px 14px; border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: 3px; }
+  .gap-cell:last-child { border-right: none; }
+  .gap-label { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); }
+  .gap-value { font-family: var(--font-mono); font-size: 1rem; }
+</style>
+
+<div class="app">
+  <header>
+    <div class="topbar-head">
+      <div>
+        <span class="brand-mark">idealDesign · prototype 2</span>
+        <h1>Say what you want. Get a wired breadboard.</h1>
+        <p class="tagline">Type a requirement in plain language — the engine interprets it, computes real component values from the underlying formulas, and lays out an actual breadboard wiring diagram, not just a parts list.</p>
+      </div>
+      <span class="preview-badge">Concept preview · rule-based interpreter, not the live app</span>
+    </div>
+  </header>
+
+  <div class="gap-strip">
+    <div class="gap-cell"><span class="gap-label">Input</span><span class="gap-value">plain-language requirement</span></div>
+    <div class="gap-cell"><span class="gap-label">Interpretation</span><span class="gap-value">3 recognized circuit intents</span></div>
+    <div class="gap-cell"><span class="gap-label">Synthesis</span><span class="gap-value">real formulas → E12 part values</span></div>
+    <div class="gap-cell"><span class="gap-label">Output</span><span class="gap-value">wired breadboard diagram + BOM</span></div>
+  </div>
+
+  <section class="panel req-panel">
+    <div class="req-row">
+      <textarea id="req-input" placeholder="e.g. blink an LED once every second / turn on an LED automatically when it gets dark">Blink an LED every 1 second</textarea>
+      <button id="req-submit">Design it →</button>
+    </div>
+    <div class="examples">
+      <span class="lbl">Try:</span>
+      <button class="example-chip" data-fill="Blink an LED every 0.5 seconds">Blink an LED every 0.5 seconds</button>
+      <button class="example-chip" data-fill="Turn on an LED automatically when it gets dark">Turn on an LED automatically when it gets dark</button>
+      <button class="example-chip" data-fill="Sound a buzzer when the temperature goes above 35 degrees">Sound a buzzer above 35 degrees</button>
+      <button class="example-chip" data-fill="Blink a green LED twice per second">Blink a green LED twice per second</button>
+      <button class="example-chip" data-fill="Alarm when it hits 40 degrees">Alarm when it hits 40 degrees</button>
+    </div>
+  </section>
+
+  <div id="interpret-line" class="interpret"></div>
+
+  <div class="results">
+    <section class="panel board-panel">
+      <h2 id="board-title">Breadboard layout</h2>
+      <div class="board-scroll"><div id="board-svg"></div></div>
+      <div class="legend" id="board-legend"></div>
+      <div>
+        <h2 style="margin-bottom:6px;">Wiring steps</h2>
+        <ol class="steps" id="steps-list"></ol>
+      </div>
+    </section>
+
+    <aside class="panel side-panel">
+      <h2>Bill of materials</h2>
+      <table class="bom">
+        <thead><tr><th>Part</th><th>Spec</th><th class="num">Cost</th></tr></thead>
+        <tbody id="bom-body"></tbody>
+      </table>
+      <div class="bom-total"><span>Total</span><span id="bom-total-val">$0.00</span></div>
+
+      <details class="formula" open>
+        <summary>How these values were computed</summary>
+        <div class="formula-body" id="formula-body"></div>
+      </details>
+
+      <div class="caveat" id="caveat-text"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ================= math helpers =================
+  const E12 = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2];
+
+  function nearestE12(target, roundUp) {
+    if (target <= 0) return E12[0];
+    const exp = Math.floor(Math.log10(target));
+    let best = null, bestDiff = Infinity;
+    for (let e = exp - 1; e <= exp + 2; e++) {
+      for (const s of E12) {
+        const val = s * Math.pow(10, e);
+        if (roundUp && val < target) continue;
+        const diff = Math.abs(val - target);
+        if (diff < bestDiff) { bestDiff = diff; best = val; }
+      }
+    }
+    if (best === null) {
+      for (let e = exp - 1; e <= exp + 3; e++) for (const s of E12) {
+        const val = s * Math.pow(10, e); const diff = Math.abs(val - target);
+        if (diff < bestDiff) { bestDiff = diff; best = val; }
+      }
+    }
+    return best;
+  }
+
+  function formatOhms(v) {
+    if (v >= 1e6) return (v / 1e6).toFixed(v % 1e6 === 0 ? 0 : 2) + " MΩ";
+    if (v >= 1e3) return (v / 1e3).toFixed(v % 1e3 === 0 ? 0 : 2) + " kΩ";
+    return v.toFixed(v % 1 === 0 ? 0 : 1) + " Ω";
+  }
+  function formatFarads(v) {
+    if (v >= 1e-6) return (v * 1e6).toFixed(v * 1e6 % 1 === 0 ? 0 : 1) + " µF";
+    if (v >= 1e-9) return (v * 1e9).toFixed(v * 1e9 % 1 === 0 ? 0 : 1) + " nF";
+    return (v * 1e12).toFixed(0) + " pF";
+  }
+
+  const DIGIT_HEX = { 0: "#0b0b0b", 1: "#7b4a2d", 2: "#d43b31", 3: "#e07f2b", 4: "#e0c92b", 5: "#4caf50", 6: "#3d6fd6", 7: "#8b3dd6", 8: "#8a8a8a", 9: "#f4f1ea" };
+  function resistorBands(ohms) {
+    let exp = Math.floor(Math.log10(ohms));
+    let mantissa = ohms / Math.pow(10, exp);
+    let base = Math.round(mantissa * 10);
+    if (base >= 100) { base = Math.round(base / 10); exp += 1; }
+    const d1 = Math.floor(base / 10), d2 = base % 10;
+    const multExp = ((exp - 1) % 10 + 10) % 10;
+    return [DIGIT_HEX[d1], DIGIT_HEX[d2], DIGIT_HEX[multExp], "#c9a227"];
+  }
+
+  function solveLedResistor(vs, vf, iA) {
+    const rRaw = Math.max(1, (vs - vf) / iA);
+    const r = nearestE12(rRaw, true);
+    const iActual = (vs - vf) / r;
+    return { r, iActual, rRaw };
+  }
+
+  const CAP_CANDIDATES = [1e-9, 10e-9, 100e-9, 1e-6, 10e-6, 100e-6];
+  function solve555(freqHz, duty) {
+    const d = duty;
+    const k = (2 * d - 1) / (1 - d);
+    let bestPick = null, bestScore = Infinity;
+    for (const c of CAP_CANDIDATES) {
+      const r2raw = 1.44 / (freqHz * c * (k + 2));
+      const r1raw = k * r2raw;
+      if (r1raw <= 0 || r2raw <= 0) continue;
+      const score = Math.abs(Math.log10(r2raw / 20000));
+      if (score < bestScore) { bestScore = score; bestPick = { c, r1raw, r2raw }; }
+    }
+    const r1 = nearestE12(bestPick.r1raw, false);
+    const r2 = nearestE12(bestPick.r2raw, false);
+    const fActual = 1.44 / ((r1 + 2 * r2) * bestPick.c);
+    const dActual = (r1 + r2) / (r1 + 2 * r2);
+    return { r1, r2, c: bestPick.c, fActual, dActual };
+  }
+
+  function solveNtcFixedR(tcCelsius, R25, B) {
+    const T = tcCelsius + 273.15, T25 = 298.15;
+    const raw = R25 * Math.exp(B * (1 / T - 1 / T25));
+    return { raw, r: nearestE12(raw, false) };
+  }
+
+  const LED_VF = { red: 2.0, yellow: 2.1, green: 3.0, blue: 3.2, white: 3.2 };
+
+  function parseLedColor(text) {
+    if (/绿|green/i.test(text)) return "green";
+    if (/蓝|blue/i.test(text)) return "blue";
+    if (/白|white/i.test(text)) return "white";
+    if (/黄|yellow/i.test(text)) return "yellow";
+    return "red";
+  }
+
+  // ================= NL parser =================
+  function parseRequirement(text) {
+    const t = text.trim();
+    if (/温度|度|热|冷|高温|降温|temperature|hot|degrees?/i.test(t) && !/闪|blink/i.test(t)) {
+      let thresh = 30;
+      const m = t.match(/(-?\d+(\.\d+)?)\s*(°|度|度[c摄]|c\b)/i) || t.match(/(-?\d+(\.\d+)?)\s*degrees?/i);
+      if (m) thresh = parseFloat(m[1]);
+      return { intent: "temp", params: { thresh }, summary: "Temperature alarm · trips above " + thresh + "°C" };
+    }
+    if (/光|暗|亮|天黑|光线|明暗|dark|light(?!ning)/i.test(t) && !/闪|blink/i.test(t)) {
+      const color = parseLedColor(t);
+      return { intent: "light", params: { color }, summary: "Dark-activated LED · " + colorLabel(color) + " indicator" };
+    }
+    if (/闪|眨|blink|flash|每隔|频率|hz|赫兹/i.test(t)) {
+      let freq = 1;
+      let m = t.match(/每隔\s*(\d+(\.\d+)?)\s*秒/);
+      if (m) freq = 1 / parseFloat(m[1]);
+      else if ((m = t.match(/(\d+(\.\d+)?)\s*秒.{0,4}(闪|一次)/))) freq = 1 / parseFloat(m[1]);
+      else if ((m = t.match(/(\d+(\.\d+)?)\s*(hz|赫兹|次\s*\/?\s*秒|次每秒)/i))) freq = parseFloat(m[1]);
+      const color = parseLedColor(t);
+      return { intent: "blink", params: { freq, color }, summary: "Blinking LED · target " + freq.toFixed(2) + " Hz · " + colorLabel(color) };
+    }
+    return { intent: "unknown", params: {}, summary: "Not recognized yet — try one of the example phrases below, or mention timing/blink, dark/light, or a temperature." };
+  }
+
+  function colorLabel(color) {
+    return { red: "red", green: "green", blue: "blue", white: "white", yellow: "yellow" }[color] || color;
+  }
+
+  // ================= breadboard drawing =================
+  const ROWY = { "V+": 14, "V-": 28, a: 66, b: 79, c: 92, d: 105, e: 118, f: 150, g: 163, h: 176, i: 189, j: 202 };
+  const COL_W = 15, LEFT = 30;
+  function xy(col, row) { return { x: LEFT + col * COL_W, y: ROWY[row] }; }
+
+  function svgEsc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  function drawBoardBase(maxCol) {
+    const w = LEFT * 2 + maxCol * COL_W, h = 224;
+    let s = "";
+    s += '<rect x="2" y="2" width="' + (w - 4) + '" height="' + (h - 4) + '" rx="8" fill="var(--bg-panel)" stroke="var(--border)"/>';
+    s += '<line x1="' + LEFT + '" y1="' + ROWY["V+"] + '" x2="' + (w - LEFT) + '" y2="' + ROWY["V+"] + '" stroke="var(--net-vcc)" stroke-width="1" opacity="0.35"/>';
+    s += '<line x1="' + LEFT + '" y1="' + ROWY["V-"] + '" x2="' + (w - LEFT) + '" y2="' + ROWY["V-"] + '" stroke="var(--net-gnd)" stroke-width="1" opacity="0.45"/>';
+    s += '<text x="6" y="' + (ROWY["V+"] + 3) + '" font-size="8" fill="var(--net-vcc)" font-family="var(--font-mono)">+5V</text>';
+    s += '<text x="6" y="' + (ROWY["V-"] + 3) + '" font-size="8" fill="var(--net-gnd)" font-family="var(--font-mono)">GND</text>';
+    for (let col = 0; col <= maxCol; col++) {
+      for (const row of Object.keys(ROWY)) {
+        const p = xy(col, row);
+        s += '<circle cx="' + p.x + '" cy="' + p.y + '" r="1.3" fill="var(--text-faint)" opacity="0.55"/>';
+      }
+      if (col % 5 === 0) s += '<text x="' + (LEFT + col * COL_W) + '" y="' + (ROWY.a - 10) + '" font-size="7" fill="var(--text-faint)" text-anchor="middle" font-family="var(--font-mono)">' + col + '</text>';
+    }
+    return { header: '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" font-family="var(--font-mono)">' + s, w, h };
+  }
+
+  function drawWire(col1, row1, col2, row2, colorVar, parts) {
+    const a = xy(col1, row1), b = xy(col2, row2);
+    const midX = (a.x + b.x) / 2;
+    const lift = Math.min(34, 10 + Math.abs(a.x - b.x) / 6 + Math.abs(a.y - b.y) / 6);
+    const midY = Math.min(a.y, b.y) - lift;
+    parts.push('<path d="M ' + a.x + ' ' + a.y + ' Q ' + midX + ' ' + midY + ' ' + b.x + ' ' + b.y + '" fill="none" stroke="' + colorVar + '" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>');
+  }
+
+  function drawResistor(col1, row, col2, ohms, parts) {
+    const a = xy(col1, row), b = xy(col2, row);
+    const bands = resistorBands(ohms);
+    parts.push('<line x1="' + a.x + '" y1="' + a.y + '" x2="' + (a.x + 6) + '" y2="' + a.y + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<line x1="' + (b.x - 6) + '" y1="' + b.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<rect x="' + (a.x + 6) + '" y="' + (a.y - 5) + '" width="' + (b.x - a.x - 12) + '" height="10" rx="2" fill="#e8dcc3" stroke="#8a7a52"/>');
+    const bodyW = b.x - a.x - 12, bx = a.x + 6;
+    bands.forEach((c, i) => {
+      parts.push('<rect x="' + (bx + 4 + i * (bodyW / 5)) + '" y="' + (a.y - 5) + '" width="3" height="10" fill="' + c + '"/>');
+    });
+    parts.push('<text x="' + ((a.x + b.x) / 2) + '" y="' + (a.y - 10) + '" font-size="9" fill="var(--text)" text-anchor="middle">' + formatOhms(ohms) + '</text>');
+  }
+
+  function drawCapacitor(col, rowTop, rowBottom, label, parts) {
+    const a = xy(col, rowTop), b = xy(col, rowBottom);
+    const midY = (a.y + b.y) / 2;
+    parts.push('<line x1="' + a.x + '" y1="' + a.y + '" x2="' + a.x + '" y2="' + (midY - 5) + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<line x1="' + b.x + '" y1="' + b.y + '" x2="' + b.x + '" y2="' + (midY + 5) + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<ellipse cx="' + a.x + '" cy="' + midY + '" rx="7" ry="6" fill="#274b6b" stroke="#5f9bd6"/>');
+    parts.push('<text x="' + (a.x + 12) + '" y="' + (midY + 3) + '" font-size="8" fill="var(--text-muted)">' + svgEsc(label) + '</text>');
+  }
+
+  function drawLED(col, rowA, rowC, colorKey, parts) {
+    const hexes = { red: "#e0453f", green: "#4caf6d", blue: "#4a80d6", white: "#e9e6de", yellow: "#e0c92b" };
+    const a = xy(col, rowA), c = xy(col, rowC);
+    const midY = (a.y + c.y) / 2;
+    parts.push('<line x1="' + a.x + '" y1="' + a.y + '" x2="' + a.x + '" y2="' + (midY - 7) + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<line x1="' + c.x + '" y1="' + c.y + '" x2="' + c.x + '" y2="' + (midY + 7) + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<circle cx="' + a.x + '" cy="' + midY + '" r="8" fill="' + hexes[colorKey] + '" opacity="0.85" stroke="var(--text)" stroke-width="0.6"/>');
+    parts.push('<text x="' + (a.x + 13) + '" y="' + (midY + 3) + '" font-size="8" fill="var(--text-muted)">LED</text>');
+  }
+
+  function drawTransistor(col, rowB, rowC, rowE, parts) {
+    const b = xy(col, rowB), c = xy(col, rowC), e = xy(col, rowE);
+    const cy = (c.y + e.y) / 2;
+    const bodyX = b.x - 9;
+    parts.push('<path d="M ' + bodyX + ' ' + (cy - 11) + ' a 9 11 0 1 1 0 22 z" fill="#3a4750" stroke="var(--text-muted)"/>');
+    parts.push('<line x1="' + b.x + '" y1="' + b.y + '" x2="' + (b.x - 9) + '" y2="' + cy + '" stroke="var(--text-muted)" stroke-width="1.3"/>');
+    parts.push('<line x1="' + c.x + '" y1="' + c.y + '" x2="' + (c.x - 4) + '" y2="' + (cy - 6) + '" stroke="var(--text-muted)" stroke-width="1.3"/>');
+    parts.push('<line x1="' + e.x + '" y1="' + e.y + '" x2="' + (e.x - 4) + '" y2="' + (cy + 6) + '" stroke="var(--text-muted)" stroke-width="1.3"/>');
+    parts.push('<text x="' + (b.x + 6) + '" y="' + (cy + 3) + '" font-size="8" fill="var(--text-muted)">NPN</text>');
+    parts.push('<text x="' + (b.x - 20) + '" y="' + (b.y - 3) + '" font-size="6.5" fill="var(--text-faint)">B</text>');
+    parts.push('<text x="' + (c.x - 20) + '" y="' + (cy - 8) + '" font-size="6.5" fill="var(--text-faint)">C</text>');
+    parts.push('<text x="' + (e.x - 20) + '" y="' + (cy + 14) + '" font-size="6.5" fill="var(--text-faint)">E</text>');
+  }
+
+  function drawTwoLeg(col, rowTop, rowBottom, label, parts) {
+    const a = xy(col, rowTop), b = xy(col, rowBottom);
+    const midY = (a.y + b.y) / 2;
+    parts.push('<line x1="' + a.x + '" y1="' + a.y + '" x2="' + a.x + '" y2="' + (midY - 8) + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<line x1="' + b.x + '" y1="' + b.y + '" x2="' + b.x + '" y2="' + (midY + 8) + '" stroke="var(--text-muted)" stroke-width="1.5"/>');
+    parts.push('<rect x="' + (a.x - 9) + '" y="' + (midY - 8) + '" width="18" height="16" rx="3" fill="#3a4750" stroke="var(--accent)"/>');
+    parts.push('<text x="' + (a.x + 14) + '" y="' + (midY + 3) + '" font-size="8" fill="var(--text-muted)">' + svgEsc(label) + '</text>');
+  }
+
+  function drawDIP8(colStart, parts) {
+    const eL = xy(colStart, "e"), eR = xy(colStart + 3, "e");
+    const fL = xy(colStart, "f"), fR = xy(colStart + 3, "f");
+    parts.push('<rect x="' + (eL.x - 5) + '" y="' + (eL.y - 3) + '" width="' + (eR.x - eL.x + 10) + '" height="' + (fL.y - eL.y + 6) + '" rx="3" fill="#3a4750" stroke="var(--accent)"/>');
+    parts.push('<circle cx="' + (eL.x + 2) + '" cy="' + (eL.y + 2) + '" r="2" fill="none" stroke="var(--text-faint)"/>');
+    parts.push('<text x="' + ((eL.x + eR.x) / 2) + '" y="' + ((eL.y + fL.y) / 2 + 3) + '" font-size="8" fill="var(--text)" text-anchor="middle" font-weight="700">NE555</text>');
+    const pinLabels = { e: ["1 GND", "2 TRIG", "3 OUT", "4 RST"], f: ["8 VCC", "7 DIS", "6 THR", "5 CTRL"] };
+    [0, 1, 2, 3].forEach((i) => {
+      const pe = xy(colStart + i, "e");
+      parts.push('<text x="' + pe.x + '" y="' + (pe.y - 6) + '" font-size="6" fill="var(--text-faint)" text-anchor="middle">' + pinLabels.e[i] + '</text>');
+      const pf = xy(colStart + i, "f");
+      parts.push('<text x="' + pf.x + '" y="' + (pf.y + 10) + '" font-size="6" fill="var(--text-faint)" text-anchor="middle">' + pinLabels.f[i] + '</text>');
+    });
+  }
+
+  // ================= templates =================
+  function buildBlink(params) {
+    const duty = 0.6;
+    const s555 = solve555(params.freq, duty);
+    const vf = LED_VF[params.color];
+    const led = solveLedResistor(5, vf, 0.015);
+
+    const parts = [];
+    const maxCol = 32;
+    drawDIP8(8, parts);
+    drawResistor(14, "c", 18, s555.r1, parts);
+    drawResistor(14, "d", 18, s555.r2, parts);
+    drawCapacitor(20, "b", "c", formatFarads(s555.c), parts);
+    drawResistor(14, "g", 18, led.r, parts);
+    drawLED(21, "g", "h", params.color, parts);
+
+    const wires = [];
+    drawWire(8, "e", 8, "V-", "var(--net-gnd)", wires); // GND
+    drawWire(8, "f", 8, "V+", "var(--net-vcc)", wires); // VCC
+    drawWire(11, "e", 11, "V+", "var(--net-vcc)", wires); // RESET tie high
+    drawWire(9, "f", 14, "c", "var(--net-sig)", wires); // DIS -> R1 left
+    drawWire(18, "c", 18, "V+", "var(--net-vcc)", wires); // R1 right -> V+
+    drawWire(14, "c", 14, "d", "var(--net-sig)", wires); // R1 left node -> R2 left node
+    drawWire(18, "d", 9, "e", "var(--net-ctrl)", wires); // R2 right -> TRIG
+    drawWire(18, "d", 10, "f", "var(--net-ctrl)", wires); // R2 right -> THR
+    drawWire(18, "d", 20, "b", "var(--net-ctrl)", wires); // R2 right -> C top
+    drawWire(20, "c", 20, "V-", "var(--net-gnd)", wires); // C bottom -> GND
+    drawWire(10, "e", 14, "g", "var(--net-sig)", wires); // OUT -> Rled
+    drawWire(18, "g", 21, "g", "var(--net-sig)", wires); // Rled -> LED anode
+    drawWire(21, "h", 21, "V-", "var(--net-gnd)", wires); // LED cathode -> GND
+
+    const bom = [
+      { part: "NE555", spec: "Timer IC", cost: 0.35 },
+      { part: "Resistor R1", spec: formatOhms(s555.r1), cost: 0.05 },
+      { part: "Resistor R2", spec: formatOhms(s555.r2), cost: 0.05 },
+      { part: "Timing capacitor", spec: formatFarads(s555.c), cost: 0.08 },
+      { part: "Resistor (LED)", spec: formatOhms(led.r), cost: 0.05 },
+      { part: "LED", spec: colorLabel(params.color), cost: 0.15 },
+    ];
+    const steps = [
+      "Place the NE555 straddling the centre gap at column 8.",
+      "Wire pin 8 (VCC) to the + rail, pin 1 (GND) to the − rail, pin 4 (RESET) to + rail.",
+      "Bridge pin 7 (DIS) through R1 to the + rail — this sets the charge path.",
+      "Bridge the R1/R2 junction through R2 to pins 2 (TRIG) and 6 (THR), tied together.",
+      "Connect that same TRIG/THR node to the timing capacitor, and the capacitor's other leg to GND.",
+      "Run pin 3 (OUT) through the LED resistor into the LED, and the LED's cathode to GND.",
+    ];
+    const formula = [
+      "R1, R2, C solved from: f = 1.44 / ((R1 + 2·R2)·C), duty = (R1+R2)/(R1+2·R2)",
+      "Target: " + params.freq.toFixed(2) + " Hz @ " + (duty * 100).toFixed(0) + "% duty → snapped to E12 → actual " + s555.fActual.toFixed(2) + " Hz @ " + (s555.dActual * 100).toFixed(1) + "%",
+      "LED resistor: R = (5V − " + vf.toFixed(1) + "V) / 15mA → " + formatOhms(led.r) + " (E12), actual " + (led.iActual * 1000).toFixed(1) + " mA",
+    ];
+    const caveat = "Classic 555 astable circuits can't reach duty cycles below 50% without an added diode — not modelled here.";
+    return { title: "Blinking LED — 555 astable oscillator", maxCol, parts, wires, bom, steps, formula, caveat, netColors: ["vcc", "gnd", "sig", "ctrl"] };
+  }
+
+  function buildLight(params) {
+    const rTop = 10000, rBase = 1000;
+    const vf = LED_VF[params.color];
+    const led = solveLedResistor(5, vf, 0.015);
+
+    const parts = [];
+    const maxCol = 32;
+    drawTwoLeg(8, "b", "c", "LDR (photoresistor)", parts);
+    drawResistor(8, "e", 12, rTop, parts);
+    drawResistor(17, "e", 21, rBase, parts);
+    drawTransistor(24, "d", "c", "e", parts);
+    drawResistor(27, "c", 30, led.r, parts);
+    drawLED(31, "c", "d", params.color, parts);
+
+    const wires = [];
+    drawWire(8, "e", 8, "V+", "var(--net-vcc)", wires); // R_top left -> V+
+    drawWire(12, "e", 8, "b", "var(--net-sig)", wires); // node -> LDR top
+    drawWire(8, "c", 8, "V-", "var(--net-gnd)", wires); // LDR bottom -> GND
+    drawWire(12, "e", 17, "e", "var(--net-sig)", wires); // node -> R_base left
+    drawWire(21, "e", 24, "d", "var(--net-ctrl)", wires); // R_base right -> base
+    drawWire(30, "c", 31, "c", "var(--net-vcc)", wires); // Rled right -> LED anode
+    drawWire(24, "e", 24, "V-", "var(--net-gnd)", wires); // emitter -> GND
+    drawWire(27, "c", 27, "V+", "var(--net-vcc)", wires); // Rled left -> V+ (feeds LED)
+    drawWire(31, "d", 24, "c", "var(--net-sig)", wires); // LED cathode -> collector
+
+    const bom = [
+      { part: "Photoresistor (LDR)", spec: "dark ≈ 200kΩ, light ≈ 1kΩ", cost: 0.2 },
+      { part: "Resistor (divider)", spec: formatOhms(rTop), cost: 0.05 },
+      { part: "Resistor (base)", spec: formatOhms(rBase), cost: 0.05 },
+      { part: "NPN transistor", spec: "2N2222", cost: 0.2 },
+      { part: "Resistor (LED)", spec: formatOhms(led.r), cost: 0.05 },
+      { part: "LED", spec: colorLabel(params.color), cost: 0.15 },
+    ];
+    const steps = [
+      "Wire a fixed 10kΩ resistor from the + rail to a node — this is the divider's top half.",
+      "Wire the LDR from that same node down to GND — the divider's bottom half.",
+      "As it gets dark, the LDR's resistance rises, pulling the node voltage up.",
+      "Feed the node through a 1kΩ base resistor into the transistor's base.",
+      "Wire the transistor as a low-side switch: LED + resistor from + rail into the collector, emitter to GND.",
+      "When the node voltage crosses ~0.7V the transistor turns on and the LED lights.",
+    ];
+    const formula = [
+      "Divider: V_node = V+ · R_LDR / (R_top + R_LDR) — rises as R_LDR increases in darkness.",
+      "R_top fixed at 10kΩ, base resistor fixed at 1kΩ (standard values for a 2N2222 switch).",
+      "LED resistor: R = (5V − " + vf.toFixed(1) + "V) / 15mA → " + formatOhms(led.r) + " (E12)",
+    ];
+    const caveat = "The exact brightness threshold depends on your specific LDR's light/dark resistance — tune R_top (or add a trimmer) to adjust sensitivity.";
+    return { title: "Dark-activated LED (night light)", maxCol, parts, wires, bom, steps, formula, caveat, netColors: ["vcc", "gnd", "sig", "ctrl"] };
+  }
+
+  function buildTemp(params) {
+    const R25 = 10000, B = 3950;
+    const ntc = solveNtcFixedR(params.thresh, R25, B);
+    const rBase = 1000;
+
+    const parts = [];
+    const maxCol = 32;
+    drawTwoLeg(8, "b", "c", "NTC thermistor 10k", parts);
+    drawResistor(8, "e", 12, ntc.r, parts);
+    drawResistor(17, "e", 21, rBase, parts);
+    drawTransistor(24, "d", "c", "e", parts);
+    drawTwoLeg(28, "b", "c", "Active buzzer", parts);
+
+    const wires = [];
+    drawWire(8, "b", 8, "V+", "var(--net-vcc)", wires); // NTC top -> V+
+    drawWire(8, "c", 8, "e", "var(--net-sig)", wires); // NTC bottom -> node
+    drawWire(12, "e", 12, "V-", "var(--net-gnd)", wires); // R_fixed right -> GND
+    drawWire(8, "e", 17, "e", "var(--net-sig)", wires); // node -> R_base left
+    drawWire(21, "e", 24, "d", "var(--net-ctrl)", wires); // R_base right -> base
+    drawWire(28, "b", 28, "V+", "var(--net-vcc)", wires); // buzzer + -> V+
+    drawWire(28, "c", 24, "c", "var(--net-sig)", wires); // buzzer - -> collector
+    drawWire(24, "e", 24, "V-", "var(--net-gnd)", wires); // emitter -> GND
+
+    const bom = [
+      { part: "NTC thermistor", spec: "10kΩ @25°C, B=3950", cost: 0.25 },
+      { part: "Resistor (divider)", spec: formatOhms(ntc.r), cost: 0.05 },
+      { part: "Resistor (base)", spec: formatOhms(rBase), cost: 0.05 },
+      { part: "NPN transistor", spec: "2N2222", cost: 0.2 },
+      { part: "Active buzzer", spec: "5V", cost: 0.6 },
+    ];
+    const steps = [
+      "Wire the NTC thermistor from the + rail down to a node — its resistance falls as it warms.",
+      "Wire the calculated fixed resistor from that node to GND, completing the divider.",
+      "As temperature rises past the threshold, the node voltage rises enough to turn the transistor on.",
+      "Feed the node through a 1kΩ base resistor into the transistor's base.",
+      "Wire the buzzer from the + rail into the collector, emitter to GND, as a low-side switch.",
+    ];
+    const formula = [
+      "NTC model: R(T) = R25 · exp(B · (1/T − 1/T25)), T in kelvin, R25=10kΩ, B=3950 (typical 10k NTC).",
+      "At " + params.thresh + "°C: R ≈ " + formatOhms(ntc.raw) + " → snapped to " + formatOhms(ntc.r) + " (E12) as the fixed divider resistor.",
+    ];
+    const caveat = "The divider trips near the transistor's ~0.7V base threshold, not exactly at 50% of the supply — treat the computed resistor as a starting point and fine-tune with a trimmer for a precise setpoint.";
+    return { title: "Temperature alarm — NTC threshold switch", maxCol, parts, wires, bom, steps, formula, caveat, netColors: ["vcc", "gnd", "sig", "ctrl"] };
+  }
+
+  const NET_LABELS = { vcc: ["+ rail", "var(--net-vcc)"], gnd: ["GND", "var(--net-gnd)"], sig: ["signal node", "var(--net-sig)"], ctrl: ["control / timing", "var(--net-ctrl)"] };
+
+  function render(result) {
+    const board = drawBoardBase(result.maxCol);
+    const svg = board.header + result.parts.join("") + result.wires.join("") + "</svg>";
+    document.getElementById("board-svg").innerHTML = svg;
+    document.getElementById("board-title").textContent = result.title;
+
+    const legend = document.getElementById("board-legend");
+    legend.innerHTML = result.netColors.map((k) => {
+      const [label, color] = NET_LABELS[k];
+      return '<span><span class="sw" style="background:' + color + '"></span>' + label + '</span>';
+    }).join("");
+
+    const stepsEl = document.getElementById("steps-list");
+    stepsEl.innerHTML = result.steps.map((s) => "<li>" + s + "</li>").join("");
+
+    const bomBody = document.getElementById("bom-body");
+    bomBody.innerHTML = result.bom.map((b) => '<tr><td>' + b.part + '</td><td style="color:var(--text-muted)">' + b.spec + '</td><td class="num">$' + b.cost.toFixed(2) + '</td></tr>').join("");
+    const total = result.bom.reduce((s, b) => s + b.cost, 0);
+    document.getElementById("bom-total-val").textContent = "$" + total.toFixed(2);
+
+    document.getElementById("formula-body").innerHTML = result.formula.map((f) => "<div>" + f + "</div>").join("") + '<div class="formula-note">' + result.caveat + "</div>";
+    document.getElementById("caveat-text").textContent = "";
+  }
+
+  function runRequirement(text) {
+    const parsed = parseRequirement(text);
+    const line = document.getElementById("interpret-line");
+    if (parsed.intent === "unknown") {
+      line.className = "interpret unknown";
+      line.innerHTML = parsed.summary;
+      return;
+    }
+    line.className = "interpret";
+    line.innerHTML = '<span class="tag">' + parsed.intent.toUpperCase() + "</span> " + parsed.summary;
+
+    let result;
+    if (parsed.intent === "blink") result = buildBlink(parsed.params);
+    else if (parsed.intent === "light") result = buildLight(parsed.params);
+    else result = buildTemp(parsed.params);
+    render(result);
+  }
+
+  document.getElementById("req-submit").addEventListener("click", () => {
+    runRequirement(document.getElementById("req-input").value);
+  });
+  document.querySelectorAll(".example-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.getElementById("req-input").value = chip.dataset.fill;
+      runRequirement(chip.dataset.fill);
+    });
+  });
+  document.getElementById("req-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) runRequirement(e.target.value);
+  });
+
+  runRequirement(document.getElementById("req-input").value);
+})();
+</script>

@@ -1,0 +1,1295 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>idealDesign — Circuit Design Prototype</title>
+<style>
+  :root {
+    --bg: #14181b;
+    --bg-raised: #1b2024;
+    --bg-panel: #20262b;
+    --bg-input: #171b1e;
+    --border: #2e363c;
+    --border-soft: #262d32;
+    --text: #eae7e0;
+    --text-muted: #8d96a0;
+    --text-faint: #5f6870;
+    --accent: #e0973f;
+    --accent-strong: #f4b768;
+    --accent-ink: #241505;
+    --accent-tint: rgba(224, 151, 63, 0.14);
+
+    --cat-passive-bg: rgba(127, 184, 143, 0.15);
+    --cat-passive-fg: #9fd1ac;
+    --cat-semi-bg: rgba(111, 156, 214, 0.15);
+    --cat-semi-fg: #9dbfe8;
+    --cat-ic-bg: rgba(201, 139, 217, 0.15);
+    --cat-ic-fg: #ddabe9;
+    --cat-module-bg: rgba(224, 151, 63, 0.15);
+    --cat-module-fg: #f0b567;
+
+    --good: #5fb87c;
+    --warn: #e0b23f;
+    --critical: #e0663f;
+
+    --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f2f0ea;
+      --bg-raised: #ffffff;
+      --bg-panel: #fbf9f4;
+      --bg-input: #ffffff;
+      --border: #ddd6c8;
+      --border-soft: #e6e0d3;
+      --text: #201d18;
+      --text-muted: #6b6f74;
+      --text-faint: #9a9d9f;
+      --accent: #b5691e;
+      --accent-strong: #8f5216;
+      --accent-ink: #fff8ef;
+      --accent-tint: rgba(181, 105, 30, 0.1);
+
+      --cat-passive-bg: #e3efe4;
+      --cat-passive-fg: #2f6b43;
+      --cat-semi-bg: #e2ebf7;
+      --cat-semi-fg: #2d5993;
+      --cat-ic-bg: #f2e4f5;
+      --cat-ic-fg: #7a3a87;
+      --cat-module-bg: #f7e9d7;
+      --cat-module-fg: #92551a;
+      color-scheme: light;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #14181b;
+    --bg-raised: #1b2024;
+    --bg-panel: #20262b;
+    --bg-input: #171b1e;
+    --border: #2e363c;
+    --border-soft: #262d32;
+    --text: #eae7e0;
+    --text-muted: #8d96a0;
+    --text-faint: #5f6870;
+    --accent: #e0973f;
+    --accent-strong: #f4b768;
+    --accent-ink: #241505;
+    --accent-tint: rgba(224, 151, 63, 0.14);
+    --cat-passive-bg: rgba(127, 184, 143, 0.15);
+    --cat-passive-fg: #9fd1ac;
+    --cat-semi-bg: rgba(111, 156, 214, 0.15);
+    --cat-semi-fg: #9dbfe8;
+    --cat-ic-bg: rgba(201, 139, 217, 0.15);
+    --cat-ic-fg: #ddabe9;
+    --cat-module-bg: rgba(224, 151, 63, 0.15);
+    --cat-module-fg: #f0b567;
+    color-scheme: dark;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f2f0ea;
+    --bg-raised: #ffffff;
+    --bg-panel: #fbf9f4;
+    --bg-input: #ffffff;
+    --border: #ddd6c8;
+    --border-soft: #e6e0d3;
+    --text: #201d18;
+    --text-muted: #6b6f74;
+    --text-faint: #9a9d9f;
+    --accent: #b5691e;
+    --accent-strong: #8f5216;
+    --accent-ink: #fff8ef;
+    --accent-tint: rgba(181, 105, 30, 0.1);
+    --cat-passive-bg: #e3efe4;
+    --cat-passive-fg: #2f6b43;
+    --cat-semi-bg: #e2ebf7;
+    --cat-semi-fg: #2d5993;
+    --cat-ic-bg: #f2e4f5;
+    --cat-ic-fg: #7a3a87;
+    --cat-module-bg: #f7e9d7;
+    --cat-module-fg: #92551a;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--accent-tint); color: var(--text); }
+
+  a { color: var(--accent-strong); }
+
+  button, input, select { font-family: inherit; color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 24px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ---------- Top bar ---------- */
+
+  .topbar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .topbar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .brand-mark {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.1rem;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .tagline {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    max-width: 46ch;
+  }
+
+  .preview-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-raised);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .preview-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ---------- Gap strip ---------- */
+
+  .gap-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-raised);
+    overflow: hidden;
+  }
+
+  .gap-cell {
+    padding: 12px 16px;
+    border-right: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .gap-cell:last-child { border-right: none; }
+
+  .gap-label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+  }
+
+  .gap-value {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gap-value .then {
+    color: var(--text-faint);
+    font-size: 0.85rem;
+  }
+
+  .gap-value .arrow {
+    color: var(--text-faint);
+    padding: 0 3px;
+  }
+
+  .gap-value .now {
+    color: var(--good);
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .gap-strip {
+      animation: rise 0.5s ease-out both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  /* ---------- Workbench layout ---------- */
+
+  .workbench {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr) 320px;
+    gap: 16px;
+    align-items: start;
+  }
+
+  @media (max-width: 1080px) {
+    .workbench { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  /* ---------- Rail ---------- */
+
+  .rail { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+
+  .rail-group { display: flex; flex-direction: column; }
+
+  .rail-group + .rail-group { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-soft); }
+
+  .rail-group-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px 6px;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+  }
+
+  .rail-group-label svg { width: 13px; height: 13px; opacity: 0.85; }
+
+  .rail-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: none;
+    text-align: left;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+  }
+
+  .rail-item:hover { background: var(--bg-raised); }
+
+  .rail-item[aria-current="true"] {
+    background: var(--accent-tint);
+    border-color: var(--accent);
+    color: var(--accent-strong);
+    font-weight: 600;
+  }
+
+  .rail-item .hint {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--text-faint);
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 8px 8px;
+  }
+
+  .chip {
+    border: 1px solid var(--border);
+    background: var(--bg-raised);
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.1s ease;
+  }
+
+  .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .chip:active { transform: translateY(0); }
+
+  /* ---------- Stage ---------- */
+
+  .stage { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+  .stage-note {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    border-left: 2px solid var(--accent);
+    padding: 8px 12px;
+    background: var(--accent-tint);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+
+  .calc { display: none; flex-direction: column; gap: 18px; }
+  .calc[data-active="true"] { display: flex; }
+
+  .calc-head { display: flex; flex-direction: column; gap: 4px; }
+
+  .calc-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+  }
+
+  .calc-head p { margin: 0; color: var(--text-muted); font-size: 0.85rem; max-width: 60ch; }
+
+  .calc-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 720px) { .calc-body { grid-template-columns: 1fr; } }
+
+  .field-group { display: flex; flex-direction: column; gap: 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .field label .val {
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+
+  .field input[type="number"],
+  .field select {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: 0.875rem;
+    font-family: var(--font-mono);
+  }
+
+  .field input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .note-line {
+    font-size: 0.75rem;
+    color: var(--warn);
+    display: none;
+  }
+  .note-line[data-show="true"] { display: block; }
+
+  .result-panel {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .result-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+  }
+
+  .result-cell .k {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+  }
+
+  .result-cell .v {
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-cell .v small { color: var(--text-muted); font-size: 0.7rem; }
+
+  .diagram {
+    overflow-x: auto;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+  }
+
+  .diagram svg { display: block; margin: 0 auto; }
+  .diagram text {
+    font-family: var(--font-mono);
+    fill: var(--text);
+    font-size: 10px;
+  }
+  .diagram .muted-label { fill: var(--text-muted); }
+  .diagram .wire { stroke: var(--text-muted); stroke-width: 1.6; fill: none; }
+  .diagram .accent-part { fill: var(--accent-tint); stroke: var(--accent); stroke-width: 1.4; }
+
+  .add-btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.12s ease;
+  }
+  .add-btn:hover { filter: brightness(1.08); }
+  .add-btn:active { filter: brightness(0.95); }
+
+  /* ---------- Ledger ---------- */
+
+  .ledger { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  .ledger-head { display: flex; justify-content: space-between; align-items: baseline; }
+
+  .ledger-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1rem;
+  }
+
+  .ledger-head button {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .ledger-head button:hover { color: var(--text-muted); }
+
+  .ledger-table-wrap { overflow-x: auto; }
+
+  table.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+  }
+
+  .ledger-table th {
+    text-align: left;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-faint);
+    padding: 0 8px 6px;
+    font-weight: 500;
+  }
+
+  .ledger-table td {
+    padding: 7px 8px;
+    border-top: 1px solid var(--border-soft);
+    vertical-align: middle;
+  }
+
+  .ledger-table td.num, .ledger-table th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+
+  .cat-chip {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .cat-chip.passive { background: var(--cat-passive-bg); color: var(--cat-passive-fg); }
+  .cat-chip.semi { background: var(--cat-semi-bg); color: var(--cat-semi-fg); }
+  .cat-chip.ic { background: var(--cat-ic-bg); color: var(--cat-ic-fg); }
+  .cat-chip.module { background: var(--cat-module-bg); color: var(--cat-module-fg); }
+
+  .row-remove {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+  .row-remove:hover { color: var(--critical); }
+
+  .empty-row td {
+    text-align: center;
+    color: var(--text-faint);
+    padding: 18px 8px;
+    font-style: normal;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    tr.flash { animation: flash 0.7s ease-out; }
+    @keyframes flash {
+      from { background-color: var(--accent-tint); }
+      to { background-color: transparent; }
+    }
+  }
+
+  .ledger-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .ledger-total .amt { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .budget-bar {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-soft);
+    overflow: hidden;
+  }
+  .budget-bar-fill {
+    height: 100%;
+    background: var(--good);
+    transition: width 0.2s ease, background-color 0.2s ease;
+  }
+  .budget-caption {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .breakdown { display: flex; flex-direction: column; gap: 6px; }
+  .breakdown-bar {
+    display: flex;
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border-soft);
+  }
+  .breakdown-legend { display: flex; flex-wrap: wrap; gap: 8px 12px; font-size: 0.7rem; color: var(--text-muted); }
+  .breakdown-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .swatch { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-head">
+      <div class="brand">
+        <span class="brand-mark">idealDesign · prototype</span>
+        <h1>Designing circuits, not just shopping lists</h1>
+        <p class="tagline">A preview of the depth the shipped tool doesn't have yet: resistors, capacitors, diodes, transistors, and ICs — plus calculators that size real component values from your requirements.</p>
+      </div>
+      <span class="preview-badge">Concept preview · values illustrative</span>
+    </div>
+
+    <div class="gap-strip">
+      <div class="gap-cell">
+        <span class="gap-label">Circuit calculators</span>
+        <span class="gap-value"><span class="then">0</span><span class="arrow">→</span><span class="now">3</span></span>
+      </div>
+      <div class="gap-cell">
+        <span class="gap-label">Passive parts</span>
+        <span class="gap-value"><span class="then">0</span><span class="arrow">→</span><span class="now">17</span></span>
+      </div>
+      <div class="gap-cell">
+        <span class="gap-label">Discrete semiconductors</span>
+        <span class="gap-value"><span class="then">0</span><span class="arrow">→</span><span class="now">6</span></span>
+      </div>
+      <div class="gap-cell">
+        <span class="gap-label">Analog / timer ICs</span>
+        <span class="gap-value"><span class="then">0</span><span class="arrow">→</span><span class="now">4</span></span>
+      </div>
+      <div class="gap-cell">
+        <span class="gap-label">Breakout modules</span>
+        <span class="gap-value"><span class="now" style="color:var(--text)">55</span> <small style="color:var(--text-faint)">unchanged</small></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="workbench">
+    <!-- RAIL -->
+    <nav class="panel rail" aria-label="Component and circuit browser">
+      <div class="rail-group">
+        <div class="rail-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="19" cy="18" r="2.2"/><line x1="7" y1="11" x2="17" y2="7"/><line x1="7" y1="13" x2="17" y2="17"/></svg>
+          Circuit blocks
+        </div>
+        <button class="rail-item" data-view="led" aria-current="true">LED indicator <span class="hint">R calc</span></button>
+        <button class="rail-item" data-view="555">555 astable blinker <span class="hint">R·C calc</span></button>
+        <button class="rail-item" data-view="reg">Linear regulator supply <span class="hint">Pd calc</span></button>
+      </div>
+
+      <div class="rail-group">
+        <div class="rail-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 12h3l1.5-5 3 10 3-10 3 10 3-10 1.5 5h3"/></svg>
+          Passives
+        </div>
+        <div class="chip-row" id="chips-resistor"></div>
+        <div class="chip-row" id="chips-capacitor"></div>
+        <div class="chip-row" id="chips-misc-passive"></div>
+      </div>
+
+      <div class="rail-group">
+        <div class="rail-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="2" y1="12" x2="8" y2="12"/><path d="M8 6 L8 18 L16 12 Z"/><line x1="16" y1="6" x2="16" y2="18"/><line x1="16" y1="12" x2="22" y2="12"/></svg>
+          Semiconductors
+        </div>
+        <div class="chip-row" id="chips-semi"></div>
+      </div>
+
+      <div class="rail-group">
+        <div class="rail-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="7" y="7" width="10" height="10" rx="1"/><line x1="9" y1="2" x2="9" y2="7"/><line x1="15" y1="2" x2="15" y2="7"/><line x1="9" y1="17" x2="9" y2="22"/><line x1="15" y1="17" x2="15" y2="22"/><line x1="2" y1="9" x2="7" y2="9"/><line x1="2" y1="15" x2="7" y2="15"/><line x1="17" y1="9" x2="22" y2="9"/><line x1="17" y1="15" x2="22" y2="15"/></svg>
+          ICs
+        </div>
+        <div class="chip-row" id="chips-ic"></div>
+      </div>
+
+      <div class="rail-group">
+        <div class="rail-group-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="7" cy="8" r="0.9" fill="currentColor" stroke="none"/><circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none"/><circle cx="17" cy="8" r="0.9" fill="currentColor" stroke="none"/></svg>
+          Modules (shipped)
+        </div>
+        <div class="chip-row" id="chips-module"></div>
+      </div>
+    </nav>
+
+    <!-- STAGE -->
+    <main class="panel stage">
+      <p class="stage-note">Pick a circuit block on the left and adjust the requirements below — the resistor and capacitor values are computed live from real design formulas, then snapped to standard (E12) part values, the way you'd actually buy them.</p>
+
+      <!-- LED CALCULATOR -->
+      <section class="calc" data-calc="led" data-active="true">
+        <div class="calc-head">
+          <h2>LED current-limiting resistor</h2>
+          <p>Solves R = (V<sub>supply</sub> − V<sub>f</sub>) / I for a single LED, then rounds up to the nearest standard resistor so the LED never exceeds your target current.</p>
+        </div>
+        <div class="calc-body">
+          <div class="field-group">
+            <div class="field">
+              <label>Supply voltage <span class="val" id="led-vs-val">5.0 V</span></label>
+              <input type="range" id="led-vs" min="1.5" max="12" step="0.1" value="5">
+            </div>
+            <div class="field">
+              <label>LED color</label>
+              <select id="led-color">
+                <option value="2.0">Red — V_f ≈ 2.0 V</option>
+                <option value="2.1">Yellow — V_f ≈ 2.1 V</option>
+                <option value="3.0">Green — V_f ≈ 3.0 V</option>
+                <option value="3.2" selected>Blue / White — V_f ≈ 3.2 V</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Target current <span class="val" id="led-i-val">15 mA</span></label>
+              <input type="range" id="led-i" min="2" max="30" step="1" value="15">
+            </div>
+            <div class="note-line" id="led-note">Supply voltage must exceed the LED's forward voltage.</div>
+          </div>
+
+          <div class="result-panel">
+            <div class="result-grid">
+              <div class="result-cell"><span class="k">Calculated R</span><span class="v" id="led-r-raw">—</span></div>
+              <div class="result-cell"><span class="k">Standard part (E12)</span><span class="v" id="led-r-std">—</span></div>
+              <div class="result-cell"><span class="k">Actual current</span><span class="v" id="led-i-actual">—</span></div>
+              <div class="result-cell"><span class="k">Resistor power</span><span class="v" id="led-p">—</span></div>
+            </div>
+            <div class="diagram">
+              <svg width="260" height="90" viewBox="0 0 260 90">
+                <line class="wire" x1="10" y1="45" x2="55" y2="45"/>
+                <rect class="accent-part" x="55" y="32" width="46" height="26" rx="3"/>
+                <text x="78" y="26" text-anchor="middle" id="led-diagram-r">220Ω</text>
+                <line class="wire" x1="101" y1="45" x2="140" y2="45"/>
+                <path class="wire" d="M140 32 L140 58 L166 45 Z"/>
+                <line class="wire" x1="166" y1="32" x2="166" y2="58"/>
+                <text x="153" y="26" class="muted-label" text-anchor="middle">LED</text>
+                <line class="wire" x1="166" y1="45" x2="210" y2="45"/>
+                <line class="wire" x1="10" y1="45" x2="10" y2="75"/>
+                <line class="wire" x1="210" y1="45" x2="210" y2="75"/>
+                <line class="wire" x1="10" y1="75" x2="210" y2="75"/>
+                <text x="10" y="88" class="muted-label">V+</text>
+                <text x="200" y="88" class="muted-label">GND</text>
+              </svg>
+            </div>
+            <button class="add-btn" data-add="led">Add resistor + LED to BOM</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 555 CALCULATOR -->
+      <section class="calc" data-calc="555">
+        <div class="calc-head">
+          <h2>555 astable blinker / oscillator</h2>
+          <p>Solves the classic 555 astable equations for R1 and R2 given a target frequency, duty cycle, and timing capacitor, then snaps both resistors to E12 values and reports the frequency you'd actually get.</p>
+        </div>
+        <div class="calc-body">
+          <div class="field-group">
+            <div class="field">
+              <label>Target frequency <span class="val" id="c555-f-val">1.0 Hz</span></label>
+              <input type="range" id="c555-f" min="0.2" max="20" step="0.1" value="1">
+            </div>
+            <div class="field">
+              <label>Target duty cycle <span class="val" id="c555-d-val">60 %</span></label>
+              <input type="range" id="c555-d" min="51" max="90" step="1" value="60">
+            </div>
+            <div class="field">
+              <label>Timing capacitor C</label>
+              <select id="c555-c">
+                <option value="0.000000001">1 nF</option>
+                <option value="0.00000001">10 nF</option>
+                <option value="0.0000001">100 nF</option>
+                <option value="0.00001" selected>10 µF</option>
+                <option value="0.0001">100 µF</option>
+              </select>
+            </div>
+            <div class="note-line" data-show="true">Classic 555 astable topology only reaches duty ≥ 50% — for lower duty, a diode across R1 is required (not modeled here).</div>
+          </div>
+
+          <div class="result-panel">
+            <div class="result-grid">
+              <div class="result-cell"><span class="k">R1 (standard)</span><span class="v" id="c555-r1">—</span></div>
+              <div class="result-cell"><span class="k">R2 (standard)</span><span class="v" id="c555-r2">—</span></div>
+              <div class="result-cell"><span class="k">Actual frequency</span><span class="v" id="c555-f-actual">—</span></div>
+              <div class="result-cell"><span class="k">Actual duty</span><span class="v" id="c555-d-actual">—</span></div>
+            </div>
+            <div class="diagram">
+              <svg width="260" height="110" viewBox="0 0 260 110">
+                <rect class="accent-part" x="95" y="30" width="70" height="50" rx="4"/>
+                <text x="130" y="59" text-anchor="middle" font-weight="600">NE555</text>
+                <line class="wire" x1="60" y1="20" x2="95" y2="20"/>
+                <line class="wire" x1="60" y1="20" x2="60" y2="70"/>
+                <line class="wire" x1="60" y1="70" x2="95" y2="70"/>
+                <text x="45" y="24" class="muted-label" text-anchor="end" id="diag-r1">R1</text>
+                <text x="45" y="74" class="muted-label" text-anchor="end" id="diag-r2">R2</text>
+                <line class="wire" x1="165" y1="45" x2="205" y2="45"/>
+                <text x="215" y="49" class="muted-label">OUT</text>
+                <line class="wire" x1="95" y1="55" x2="70" y2="90"/>
+                <text x="70" y="102" class="muted-label" text-anchor="middle" id="diag-c">C</text>
+              </svg>
+            </div>
+            <button class="add-btn" data-add="555">Add 555 timer + R1 + R2 + C to BOM</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- REGULATOR CALCULATOR -->
+      <section class="calc" data-calc="reg">
+        <div class="calc-head">
+          <h2>Linear regulator power supply</h2>
+          <p>Computes the power a linear regulator has to burn off as heat (P<sub>d</sub> = (V<sub>in</sub> − V<sub>out</sub>) × I<sub>out</sub>) and flags when a TO-220 package needs a heatsink.</p>
+        </div>
+        <div class="calc-body">
+          <div class="field-group">
+            <div class="field">
+              <label>Input voltage <span class="val" id="reg-vin-val">9.0 V</span></label>
+              <input type="range" id="reg-vin" min="5" max="18" step="0.5" value="9">
+            </div>
+            <div class="field">
+              <label>Regulated output</label>
+              <select id="reg-vout">
+                <option value="5">5.0 V — LM7805</option>
+                <option value="3.3" selected>3.3 V — AMS1117-3.3</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Load current <span class="val" id="reg-i-val">200 mA</span></label>
+              <input type="range" id="reg-i" min="10" max="1000" step="10" value="200">
+            </div>
+            <div class="note-line" id="reg-note">Input voltage must exceed output plus ~1.5 V dropout.</div>
+          </div>
+
+          <div class="result-panel">
+            <div class="result-grid">
+              <div class="result-cell"><span class="k">Power dissipated</span><span class="v" id="reg-pd">—</span></div>
+              <div class="result-cell"><span class="k">Heatsink</span><span class="v" id="reg-heatsink">—</span></div>
+              <div class="result-cell"><span class="k">Input cap</span><span class="v" id="reg-cin">—</span></div>
+              <div class="result-cell"><span class="k">Output cap</span><span class="v" id="reg-cout">—</span></div>
+            </div>
+            <div class="diagram">
+              <svg width="260" height="90" viewBox="0 0 260 90">
+                <line class="wire" x1="10" y1="35" x2="55" y2="35"/>
+                <rect class="accent-part" x="55" y="20" width="70" height="30" rx="3"/>
+                <text x="90" y="39" text-anchor="middle" id="diag-reg-name" font-size="9">AMS1117</text>
+                <line class="wire" x1="125" y1="35" x2="170" y2="35"/>
+                <line class="wire" x1="35" y1="35" x2="35" y2="65"/>
+                <line class="wire" x1="10" y1="35" x2="10" y2="65"/>
+                <line class="wire" x1="10" y1="65" x2="35" y2="65"/>
+                <rect x="30" y="45" width="10" height="16" fill="none" stroke="var(--text-muted)"/>
+                <line class="wire" x1="150" y1="35" x2="150" y2="65"/>
+                <line class="wire" x1="170" y1="35" x2="170" y2="65"/>
+                <line class="wire" x1="150" y1="65" x2="170" y2="65"/>
+                <rect x="145" y="45" width="10" height="16" fill="none" stroke="var(--text-muted)"/>
+                <text x="10" y="80" class="muted-label">V_in</text>
+                <text x="170" y="80" class="muted-label" text-anchor="end">V_out</text>
+              </svg>
+            </div>
+            <button class="add-btn" data-add="reg">Add regulator + caps to BOM</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- LEDGER -->
+    <aside class="panel ledger">
+      <div class="ledger-head">
+        <h2>Bill of materials</h2>
+        <button id="clear-bom">Clear</button>
+      </div>
+      <div class="ledger-table-wrap">
+        <table class="ledger-table">
+          <thead>
+            <tr><th>Part</th><th></th><th class="num">Qty</th><th class="num">Total</th><th></th></tr>
+          </thead>
+          <tbody id="bom-body">
+            <tr class="empty-row"><td colspan="5">Nothing added yet — try a calculator or click a part chip.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div class="budget-caption"><span>Budget used</span><span id="budget-caption-val">$0.00 / $40.00</span></div>
+        <div class="budget-bar"><div class="budget-bar-fill" id="budget-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="breakdown">
+        <div class="breakdown-bar" id="breakdown-bar"></div>
+        <div class="breakdown-legend" id="breakdown-legend"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const E12 = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2];
+
+  function nearestE12(target, roundUp) {
+    if (target <= 0) return E12[0];
+    const exp = Math.floor(Math.log10(target));
+    let best = null, bestDiff = Infinity;
+    for (let e = exp - 1; e <= exp + 2; e++) {
+      for (const s of E12) {
+        const val = s * Math.pow(10, e);
+        if (roundUp && val < target) continue;
+        const diff = Math.abs(val - target);
+        if (diff < bestDiff) { bestDiff = diff; best = val; }
+      }
+    }
+    if (best === null) {
+      for (let e = exp - 1; e <= exp + 3; e++) {
+        for (const s of E12) {
+          const val = s * Math.pow(10, e);
+          const diff = Math.abs(val - target);
+          if (diff < bestDiff) { bestDiff = diff; best = val; }
+        }
+      }
+    }
+    return best;
+  }
+
+  function formatOhms(v) {
+    if (v >= 1e6) return (v / 1e6).toFixed(v % 1e6 === 0 ? 0 : 2) + " MΩ";
+    if (v >= 1e3) return (v / 1e3).toFixed(v % 1e3 === 0 ? 0 : 2) + " kΩ";
+    return v.toFixed(v % 1 === 0 ? 0 : 1) + " Ω";
+  }
+
+  function formatFarads(v) {
+    if (v >= 1e-3) return (v * 1e3).toFixed(2) + " mF";
+    if (v >= 1e-6) return (v * 1e6).toFixed(v * 1e6 % 1 === 0 ? 0 : 1) + " µF";
+    if (v >= 1e-9) return (v * 1e9).toFixed(v * 1e9 % 1 === 0 ? 0 : 1) + " nF";
+    return (v * 1e12).toFixed(0) + " pF";
+  }
+
+  function watRating(powerW) {
+    const ratings = [0.125, 0.25, 0.5, 1, 2];
+    const target = powerW * 2; // headroom
+    for (const r of ratings) if (r >= target) return r;
+    return ratings[ratings.length - 1];
+  }
+
+  const PRICE = {
+    resistor: 0.05, capacitor_c: 0.08, capacitor_e: 0.12, pot: 0.6,
+    diode_signal: 0.08, diode_rect: 0.1, led: 0.15,
+    transistor: 0.2, ic555: 0.35, reg7805: 0.45, regams: 0.3, lm358: 0.55,
+    module: 6.5,
+  };
+
+  // ---------- BOM state ----------
+  const bom = [];
+
+  function addToBom(entry) {
+    const existing = bom.find((b) => b.cat === entry.cat && b.part === entry.part && b.spec === entry.spec);
+    if (existing) existing.qty += entry.qty || 1;
+    else bom.push(Object.assign({ qty: 1 }, entry));
+    renderLedger(true);
+  }
+
+  function removeFromBom(idx) {
+    bom.splice(idx, 1);
+    renderLedger(false);
+  }
+
+  const CAT_LABEL = { passive: "Passive", semi: "Semi", ic: "IC", module: "Module" };
+
+  function renderLedger(flash) {
+    const body = document.getElementById("bom-body");
+    body.innerHTML = "";
+    if (bom.length === 0) {
+      body.innerHTML = '<tr class="empty-row"><td colspan="5">Nothing added yet — try a calculator or click a part chip.</td></tr>';
+    } else {
+      bom.forEach((b, i) => {
+        const tr = document.createElement("tr");
+        if (flash && i === bom.length - 1) tr.className = "flash";
+        const total = b.price * b.qty;
+        tr.innerHTML =
+          '<td>' + b.part + '<div style="color:var(--text-faint);font-size:0.7rem">' + b.spec + '</div></td>' +
+          '<td><span class="cat-chip ' + b.cat + '">' + CAT_LABEL[b.cat] + '</span></td>' +
+          '<td class="num">' + b.qty + '</td>' +
+          '<td class="num">$' + total.toFixed(2) + '</td>' +
+          '<td><button class="row-remove" data-remove="' + i + '" aria-label="Remove ' + b.part + '">×</button></td>';
+        body.appendChild(tr);
+      });
+    }
+
+    const total = bom.reduce((s, b) => s + b.price * b.qty, 0);
+    const budget = 40;
+    const pct = Math.min(100, (total / budget) * 100);
+    document.getElementById("budget-caption-val").textContent = "$" + total.toFixed(2) + " / $" + budget.toFixed(2);
+    const fill = document.getElementById("budget-fill");
+    fill.style.width = pct + "%";
+    fill.style.backgroundColor = pct > 100 ? "var(--critical)" : pct > 75 ? "var(--warn)" : "var(--good)";
+
+    const byCat = {};
+    bom.forEach((b) => { byCat[b.cat] = (byCat[b.cat] || 0) + b.price * b.qty; });
+    const catColor = { passive: "var(--cat-passive-fg)", semi: "var(--cat-semi-fg)", ic: "var(--cat-ic-fg)", module: "var(--cat-module-fg)" };
+    const bar = document.getElementById("breakdown-bar");
+    const legend = document.getElementById("breakdown-legend");
+    bar.innerHTML = "";
+    legend.innerHTML = "";
+    const catTotal = Object.values(byCat).reduce((a, c) => a + c, 0) || 1;
+    Object.keys(CAT_LABEL).forEach((cat) => {
+      const amt = byCat[cat] || 0;
+      if (amt <= 0) return;
+      const seg = document.createElement("div");
+      seg.style.width = (amt / catTotal) * 100 + "%";
+      seg.style.background = catColor[cat];
+      bar.appendChild(seg);
+      const item = document.createElement("span");
+      item.innerHTML = '<span class="swatch" style="background:' + catColor[cat] + '"></span>' + CAT_LABEL[cat] + " $" + amt.toFixed(2);
+      legend.appendChild(item);
+    });
+    if (bom.length === 0) {
+      const seg = document.createElement("div");
+      seg.style.width = "100%";
+      seg.style.background = "var(--border)";
+      bar.appendChild(seg);
+    }
+  }
+
+  document.getElementById("bom-body").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove]");
+    if (btn) removeFromBom(Number(btn.dataset.remove));
+  });
+  document.getElementById("clear-bom").addEventListener("click", () => { bom.length = 0; renderLedger(false); });
+
+  // ---------- Rail navigation ----------
+  const railItems = document.querySelectorAll(".rail-item[data-view]");
+  railItems.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      railItems.forEach((b) => b.removeAttribute("aria-current"));
+      btn.setAttribute("aria-current", "true");
+      document.querySelectorAll(".calc").forEach((c) => c.removeAttribute("data-active"));
+      document.querySelector('.calc[data-calc="' + btn.dataset.view + '"]').setAttribute("data-active", "true");
+    });
+  });
+
+  // ---------- Chip libraries ----------
+  function makeChips(containerId, items, onClick) {
+    const el = document.getElementById(containerId);
+    items.forEach((item) => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.type = "button";
+      chip.textContent = item.label;
+      chip.title = "Add to BOM";
+      chip.addEventListener("click", () => onClick(item));
+      el.appendChild(chip);
+    });
+  }
+
+  makeChips("chips-resistor", [
+    { label: "220Ω", part: "Resistor", spec: "220 Ω · 1/4W" },
+    { label: "330Ω", part: "Resistor", spec: "330 Ω · 1/4W" },
+    { label: "1kΩ", part: "Resistor", spec: "1 kΩ · 1/4W" },
+    { label: "4.7kΩ", part: "Resistor", spec: "4.7 kΩ · 1/4W" },
+    { label: "10kΩ", part: "Resistor", spec: "10 kΩ · 1/4W" },
+    { label: "100kΩ", part: "Resistor", spec: "100 kΩ · 1/4W" },
+  ], (i) => addToBom({ cat: "passive", part: i.part, spec: i.spec, price: PRICE.resistor }));
+
+  makeChips("chips-capacitor", [
+    { label: "100nF", part: "Ceramic capacitor", spec: "100 nF", e: true },
+    { label: "1µF", part: "Ceramic capacitor", spec: "1 µF", e: true },
+    { label: "10µF", part: "Electrolytic capacitor", spec: "10 µF · 16V", e: false },
+    { label: "100µF", part: "Electrolytic capacitor", spec: "100 µF · 16V", e: false },
+    { label: "470µF", part: "Electrolytic capacitor", spec: "470 µF · 16V", e: false },
+  ], (i) => addToBom({ cat: "passive", part: i.part, spec: i.spec, price: i.e ? PRICE.capacitor_c : PRICE.capacitor_e }));
+
+  makeChips("chips-misc-passive", [
+    { label: "Pot 10k", part: "Potentiometer", spec: "10 kΩ linear" },
+    { label: "1N4148", part: "Diode", spec: "1N4148 signal" },
+    { label: "1N4001", part: "Diode", spec: "1N4001 rectifier" },
+  ], (i) => {
+    const price = i.label === "Pot 10k" ? PRICE.pot : i.label === "1N4148" ? PRICE.diode_signal : PRICE.diode_rect;
+    addToBom({ cat: "passive", part: i.part, spec: i.spec, price });
+  });
+
+  makeChips("chips-semi", [
+    { label: "LED red", spec: "Red · V_f 2.0V" },
+    { label: "LED green", spec: "Green · V_f 3.0V" },
+    { label: "LED blue", spec: "Blue · V_f 3.2V" },
+    { label: "2N2222 NPN", spec: "NPN transistor" },
+    { label: "2N3906 PNP", spec: "PNP transistor" },
+  ], (i) => {
+    const isLed = i.label.startsWith("LED");
+    addToBom({ cat: "semi", part: isLed ? "LED" : "Transistor", spec: i.spec, price: isLed ? PRICE.led : PRICE.transistor });
+  });
+
+  makeChips("chips-ic", [
+    { label: "NE555", spec: "Timer IC" },
+    { label: "LM7805", spec: "5V linear regulator, TO-220" },
+    { label: "AMS1117-3.3", spec: "3.3V LDO, SOT-223" },
+    { label: "LM358", spec: "Dual op-amp" },
+  ], (i) => {
+    const price = i.label === "NE555" ? PRICE.ic555 : i.label === "LM7805" ? PRICE.reg7805 : i.label === "AMS1117-3.3" ? PRICE.regams : PRICE.lm358;
+    addToBom({ cat: "ic", part: i.label, spec: i.spec, price });
+  });
+
+  makeChips("chips-module", [
+    { label: "ESP32", spec: "WiFi/BLE MCU", price: 10.99 },
+    { label: "DHT22", spec: "Temp + humidity", price: 5.99 },
+    { label: "SSD1306", spec: "0.96\" OLED", price: 6.49 },
+  ], (i) => addToBom({ cat: "module", part: i.label, spec: i.spec, price: i.price }));
+
+  // ---------- LED calculator ----------
+  const ledVs = document.getElementById("led-vs");
+  const ledColor = document.getElementById("led-color");
+  const ledI = document.getElementById("led-i");
+
+  function computeLed() {
+    const vs = parseFloat(ledVs.value);
+    const vf = parseFloat(ledColor.value);
+    const iTarget = parseFloat(ledI.value) / 1000;
+
+    document.getElementById("led-vs-val").textContent = vs.toFixed(1) + " V";
+    document.getElementById("led-i-val").textContent = (iTarget * 1000).toFixed(0) + " mA";
+
+    const note = document.getElementById("led-note");
+    if (vs <= vf) {
+      note.setAttribute("data-show", "true");
+      ["led-r-raw", "led-r-std", "led-i-actual", "led-p"].forEach((id) => (document.getElementById(id).textContent = "—"));
+      return;
+    }
+    note.removeAttribute("data-show");
+
+    const rRaw = (vs - vf) / iTarget;
+    const rStd = nearestE12(rRaw, true);
+    const iActual = (vs - vf) / rStd;
+    const p = iActual * iActual * rStd;
+    const rating = watRating(p);
+
+    document.getElementById("led-r-raw").textContent = formatOhms(rRaw);
+    document.getElementById("led-r-std").textContent = formatOhms(rStd);
+    document.getElementById("led-i-actual").innerHTML = (iActual * 1000).toFixed(1) + " mA";
+    document.getElementById("led-p").innerHTML = p.toFixed(3) + " W <small>· " + rating + "W part</small>";
+    document.getElementById("led-diagram-r").textContent = formatOhms(rStd);
+
+    computeLed._latest = { rStd, rating, vf, colorLabel: ledColor.options[ledColor.selectedIndex].text.split(" —")[0] };
+  }
+
+  [ledVs, ledColor, ledI].forEach((el) => el.addEventListener("input", computeLed));
+
+  document.querySelector('[data-add="led"]').addEventListener("click", () => {
+    computeLed();
+    const d = computeLed._latest;
+    if (!d) return;
+    addToBom({ cat: "passive", part: "Resistor", spec: formatOhms(d.rStd) + " · " + d.rating + "W", price: PRICE.resistor });
+    addToBom({ cat: "semi", part: "LED", spec: d.colorLabel + " · V_f " + d.vf.toFixed(1) + "V", price: PRICE.led });
+  });
+
+  // ---------- 555 calculator ----------
+  const c555F = document.getElementById("c555-f");
+  const c555D = document.getElementById("c555-d");
+  const c555C = document.getElementById("c555-c");
+
+  function compute555() {
+    const f = parseFloat(c555F.value);
+    const dPct = parseFloat(c555D.value);
+    const c = parseFloat(c555C.value);
+    const d = dPct / 100;
+
+    document.getElementById("c555-f-val").textContent = f.toFixed(1) + " Hz";
+    document.getElementById("c555-d-val").textContent = dPct.toFixed(0) + " %";
+
+    const k = (2 * d - 1) / (1 - d);
+    const r2raw = 1.44 / (f * c * (k + 2));
+    const r1raw = k * r2raw;
+    const r1 = nearestE12(r1raw, false);
+    const r2 = nearestE12(r2raw, false);
+
+    const fActual = 1.44 / ((r1 + 2 * r2) * c);
+    const dActual = (r1 + r2) / (r1 + 2 * r2);
+
+    document.getElementById("c555-r1").textContent = formatOhms(r1);
+    document.getElementById("c555-r2").textContent = formatOhms(r2);
+    document.getElementById("c555-f-actual").innerHTML = fActual.toFixed(2) + " Hz <small>target " + f.toFixed(1) + "</small>";
+    document.getElementById("c555-d-actual").innerHTML = (dActual * 100).toFixed(1) + " % <small>target " + dPct.toFixed(0) + "</small>";
+    document.getElementById("diag-r1").textContent = "R1 " + formatOhms(r1);
+    document.getElementById("diag-r2").textContent = "R2 " + formatOhms(r2);
+    document.getElementById("diag-c").textContent = "C " + formatFarads(c);
+
+    compute555._latest = { r1, r2, c };
+  }
+
+  [c555F, c555D, c555C].forEach((el) => el.addEventListener("input", compute555));
+
+  document.querySelector('[data-add="555"]').addEventListener("click", () => {
+    compute555();
+    const d = compute555._latest;
+    if (!d) return;
+    addToBom({ cat: "ic", part: "NE555", spec: "Timer IC", price: PRICE.ic555 });
+    addToBom({ cat: "passive", part: "Resistor", spec: formatOhms(d.r1) + " (R1)", price: PRICE.resistor });
+    addToBom({ cat: "passive", part: "Resistor", spec: formatOhms(d.r2) + " (R2)", price: PRICE.resistor });
+    addToBom({ cat: "passive", part: "Capacitor", spec: formatFarads(d.c) + " timing cap", price: PRICE.capacitor_c });
+  });
+
+  // ---------- Regulator calculator ----------
+  const regVin = document.getElementById("reg-vin");
+  const regVout = document.getElementById("reg-vout");
+  const regI = document.getElementById("reg-i");
+
+  function computeReg() {
+    const vin = parseFloat(regVin.value);
+    const vout = parseFloat(regVout.value);
+    const iOut = parseFloat(regI.value) / 1000;
+    const isAms = vout === 3.3;
+
+    document.getElementById("reg-vin-val").textContent = vin.toFixed(1) + " V";
+    document.getElementById("reg-i-val").textContent = (iOut * 1000).toFixed(0) + " mA";
+    document.getElementById("diag-reg-name").textContent = isAms ? "AMS1117" : "LM7805";
+
+    const dropout = isAms ? 1.1 : 2.0;
+    const note = document.getElementById("reg-note");
+    if (vin < vout + dropout) {
+      note.setAttribute("data-show", "true");
+    } else {
+      note.removeAttribute("data-show");
+    }
+
+    const pd = Math.max(0, (vin - vout) * iOut);
+    document.getElementById("reg-pd").textContent = pd.toFixed(2) + " W";
+
+    const hsEl = document.getElementById("reg-heatsink");
+    if (pd > 2) { hsEl.innerHTML = "Required <small>(TO-220, >2W)</small>"; hsEl.style.color = "var(--critical)"; }
+    else if (pd > 1) { hsEl.innerHTML = "Recommended <small>(1–2W)</small>"; hsEl.style.color = "var(--warn)"; }
+    else { hsEl.innerHTML = "Not needed"; hsEl.style.color = "var(--good)"; }
+
+    document.getElementById("reg-cin").textContent = isAms ? "10 µF" : "0.33 µF";
+    document.getElementById("reg-cout").textContent = isAms ? "1 µF (min, tantalum)" : "0.1 µF";
+
+    computeReg._latest = { isAms, pd, cin: isAms ? "10 µF" : "0.33 µF", cout: isAms ? "1 µF" : "0.1 µF" };
+  }
+
+  [regVin, regVout, regI].forEach((el) => el.addEventListener("input", computeReg));
+
+  document.querySelector('[data-add="reg"]').addEventListener("click", () => {
+    computeReg();
+    const d = computeReg._latest;
+    if (!d) return;
+    addToBom({ cat: "ic", part: d.isAms ? "AMS1117-3.3" : "LM7805", spec: d.isAms ? "3.3V LDO" : "5V linear reg", price: d.isAms ? PRICE.regams : PRICE.reg7805 });
+    addToBom({ cat: "passive", part: "Ceramic capacitor", spec: d.cin + " input", price: PRICE.capacitor_c });
+    addToBom({ cat: "passive", part: "Capacitor", spec: d.cout + " output", price: PRICE.capacitor_c });
+  });
+
+  // ---------- init ----------
+  computeLed();
+  compute555();
+  computeReg();
+  renderLedger(false);
+})();
+</script>

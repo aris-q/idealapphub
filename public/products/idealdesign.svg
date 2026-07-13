@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#14181b"/>
+  <rect x="40" y="40" width="560" height="230" rx="10" fill="#20262b" stroke="#2e363c" stroke-width="2"/>
+  <g fill="#5f6870" opacity=".6">
+    <circle cx="80" cy="80" r="3"/><circle cx="110" cy="80" r="3"/><circle cx="140" cy="80" r="3"/><circle cx="170" cy="80" r="3"/><circle cx="200" cy="80" r="3"/>
+    <circle cx="80" cy="110" r="3"/><circle cx="110" cy="110" r="3"/><circle cx="140" cy="110" r="3"/><circle cx="170" cy="110" r="3"/><circle cx="200" cy="110" r="3"/>
+    <circle cx="80" cy="230" r="3"/><circle cx="110" cy="230" r="3"/><circle cx="140" cy="230" r="3"/><circle cx="170" cy="230" r="3"/><circle cx="200" cy="230" r="3"/>
+  </g>
+  <line x1="70" y1="155" x2="130" y2="155" stroke="#8d96a0" stroke-width="3"/>
+  <rect x="130" y="143" width="80" height="24" rx="4" fill="#e8dcc3" stroke="#8a7a52" stroke-width="2"/>
+  <rect x="142" y="143" width="7" height="24" fill="#d43b31"/>
+  <rect x="158" y="143" width="7" height="24" fill="#d43b31"/>
+  <rect x="174" y="143" width="7" height="24" fill="#7b4a2d"/>
+  <rect x="192" y="143" width="7" height="24" fill="#c9a227"/>
+  <line x1="210" y1="155" x2="270" y2="155" stroke="#8d96a0" stroke-width="3"/>
+  <rect x="290" y="120" width="110" height="70" rx="6" fill="rgba(224,151,63,0.14)" stroke="#e0973f" stroke-width="2.5"/>
+  <text x="345" y="162" font-family="Consolas, monospace" font-size="18" font-weight="bold" fill="#eae7e0" text-anchor="middle">NE555</text>
+  <line x1="400" y1="155" x2="450" y2="155" stroke="#8d96a0" stroke-width="3"/>
+  <path d="M450 140 L450 170 L478 155 Z" fill="none" stroke="#e0973f" stroke-width="3" stroke-linejoin="round"/>
+  <line x1="478" y1="140" x2="478" y2="170" stroke="#e0973f" stroke-width="3"/>
+  <line x1="478" y1="155" x2="530" y2="155" stroke="#8d96a0" stroke-width="3"/>
+  <g stroke="#e0973f" stroke-width="2" opacity=".8">
+    <line x1="490" y1="128" x2="498" y2="118"/><line x1="478" y1="122" x2="482" y2="110"/><line x1="466" y1="128" x2="458" y2="118"/>
+  </g>
+  <text x="70" y="66" font-family="Consolas, monospace" font-size="12" fill="#e0973f" letter-spacing="2">R = (V − Vf) / I → E12</text>
+  <text x="530" y="252" font-family="Consolas, monospace" font-size="12" fill="#8d96a0" text-anchor="end">f = 1.44 / ((R1+2R2)·C)</text>
+  <text x="320" y="322" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#eae7e0" text-anchor="middle">ideal<tspan fill="#e0973f">Design</tspan></text>
+</svg>
