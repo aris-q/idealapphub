@@ -31,7 +31,7 @@ function NewsRow({ item }) {
       background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6,
       marginBottom: 8, textDecoration: "none"
     }}>
-      <span style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap", minWidth: 56 }}>
+      <span style={{ fontSize: 12, color: "var(--accent)", whiteSpace: "nowrap", minWidth: 56 }}>
         {formatDate(item.ts)}
       </span>
       <SourceBadge source={item.source} />
@@ -75,13 +75,13 @@ export default function AINewsSection({ highlights = [], today = [], week = [] }
       )}
 
       <div style={{ marginBottom: 32 }}>
-        <p style={{ fontSize: 12, letterSpacing: 3, color: "var(--text-muted)", marginBottom: 12 }}>TODAY</p>
+        <p style={{ fontSize: 12, letterSpacing: 3, color: "var(--accent)", marginBottom: 12 }}>TODAY</p>
         {today.length === 0 && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Nothing yet today — check back soon.</p>}
         {today.map((item) => <NewsRow key={item.id} item={item} />)}
       </div>
 
       <div>
-        <p style={{ fontSize: 12, letterSpacing: 3, color: "var(--text-muted)", marginBottom: 12 }}>THIS WEEK</p>
+        <p style={{ fontSize: 12, letterSpacing: 3, color: "var(--accent)", marginBottom: 12 }}>THIS WEEK</p>
         {week.length === 0 && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>No items this week.</p>}
         {week.map((item) => <NewsRow key={item.id} item={item} />)}
       </div>
