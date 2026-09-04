@@ -1,4 +1,5 @@
 import { Icon } from "./Brand";
+import SourceChips from "./SourceChips";
 
 const SOURCE_COLORS = {
   "Sequoia Capital": "var(--accent)",
@@ -54,6 +55,28 @@ export default function VCInvestorSection({ items = [] }) {
           TechCrunch
         </a>
       </p>
+      <SourceChips label="MORE VC & FUNDING COVERAGE" links={[
+        { label: "Newcomer", href: "https://www.newcomer.co/" },
+        { label: "StrictlyVC", href: "https://www.strictlyvc.com/" },
+        { label: "Crunchbase News", href: "https://news.crunchbase.com/" },
+      ]} />
+      <SourceChips label="VC FIRMS TO WATCH" links={[
+        { label: "a16z", href: "https://a16z.com/" },
+        { label: "Sequoia", href: "https://www.sequoiacap.com/" },
+        { label: "General Catalyst", href: "https://www.generalcatalyst.com/" },
+        { label: "Benchmark", href: "https://www.benchmark.com/" },
+        { label: "Founders Fund", href: "https://foundersfund.com/" },
+        { label: "Lightspeed", href: "https://lsvp.com/" },
+        { label: "Index Ventures", href: "https://www.indexventures.com/" },
+        { label: "Greylock", href: "https://greylock.com/" },
+        { label: "Khosla Ventures", href: "https://www.khoslaventures.com/" },
+        { label: "Thrive Capital", href: "https://thrivecap.com/" },
+        { label: "Coatue", href: "https://www.coatue.com/" },
+        { label: "NEA", href: "https://www.nea.com/" },
+        { label: "IVP", href: "https://www.ivp.com/" },
+        { label: "Radical Ventures", href: "https://radical.vc/" },
+        { label: "Lux Capital", href: "https://www.luxcapital.com/" },
+      ]} />
       {items.length === 0 && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Nothing to show right now.</p>}
       {items.map((item) => <InvestorRow key={item.id} item={item} />)}
     </section>

@@ -1,4 +1,5 @@
 import { Icon } from "./Brand";
+import SourceChips from "./SourceChips";
 
 function formatDate(ts) {
   return new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -32,6 +33,10 @@ export default function IndustryInsightsSection({ items = [] }) {
           TechCrunch
         </a>
       </p>
+      <SourceChips label="ALSO WORTH FOLLOWING" links={[
+        { label: "The Information", href: "https://www.theinformation.com/" },
+        { label: "Crunchbase News", href: "https://news.crunchbase.com/" },
+      ]} />
       {items.length === 0 && <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Nothing to show right now.</p>}
       {items.map((item) => <InsightRow key={item.id} item={item} />)}
     </section>
