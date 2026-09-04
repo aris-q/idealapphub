@@ -6,6 +6,9 @@ import { PromptMark } from "./Brand";
 
 const LINKS = [
   { label: "News", href: "/#news" },
+  { label: "Insights", href: "/#insights" },
+  { label: "Investors", href: "/#investors" },
+  { label: "Markets", href: "/#markets" },
   { label: "Podcast", href: "/#podcast" },
   { label: "Hackathons", href: "/#hackathons" },
   { label: "Products", href: "/products" },
@@ -39,7 +42,7 @@ export default function Navbar() {
         IDEALAPP<span style={{ color: "var(--text-primary)" }}>HUB</span>
       </Link>
 
-      <div style={{ display: "flex", gap: 8, fontSize: 12 }}>
+      <div style={{ display: "flex", gap: 8, fontSize: 12, flexWrap: "wrap", justifyContent: "flex-end" }}>
         {LINKS.map(({ label, href }) => {
           const active = isActive(href);
           return (

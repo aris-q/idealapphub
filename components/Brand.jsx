@@ -61,6 +61,9 @@ const ICON_PATHS = {
   admin: <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" /></>,
   podcast: <><circle cx="12" cy="10" r="3.5" /><path d="M6 10a6 6 0 0 0 12 0" /><path d="M12 16v5M9 21h6" /></>,
   event: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M8 3v4M16 3v4M3 11h18" /></>,
+  insight: <><path d="M9 18h6M10 22h4" /><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z" /></>,
+  investor: <><path d="M3 17l6-6 4 4 8-8" /><path d="M15 7h6v6" /></>,
+  market: <><path d="M4 20V10M10 20V4M16 20v-7M22 20V13" /></>,
 };
 
 export function Icon({ name, size = 18, color = "var(--accent)" }) {
