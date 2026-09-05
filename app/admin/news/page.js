@@ -71,7 +71,7 @@ export default function AdminNews() {
           <button onClick={() => router.push("/admin/dashboard")} style={{ fontSize: 11, padding: "6px 14px", border: "1px solid #1a2a4a", color: "#7a9cc8", background: "transparent", borderRadius: 4, cursor: "pointer" }}>← BACK</button>
         </div>
       </nav>
-      <main style={{ padding: "40px 32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
+      <main style={{ padding: "40px 32px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40 }}>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>New Post</h2>
           <form onSubmit={handleSubmit}>

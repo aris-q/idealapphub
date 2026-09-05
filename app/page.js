@@ -4,6 +4,7 @@ import AINewsSection from "../components/AINewsSection";
 import IndustryInsightsSection from "../components/IndustryInsightsSection";
 import VCInvestorSection from "../components/VCInvestorSection";
 import MarketViewsSection from "../components/MarketViewsSection";
+import StockTableSection from "../components/StockTableSection";
 import PodcastSection from "../components/PodcastSection";
 import HackathonSection from "../components/HackathonSection";
 import ContactSection from "../components/ContactSection";
@@ -19,6 +20,7 @@ import {
   getMarketViews,
   bucketByDate,
 } from "../lib/aiNews";
+import { getStockQuotes, DEFAULT_TICKERS } from "../lib/stocks";
 
 export const dynamic = "force-dynamic";
 
@@ -46,8 +48,20 @@ async function getOwnNews() {
   }
 }
 
+async function getStockTable() {
+  try {
+    const q = query(collection(db, "tickers"), orderBy("symbol", "asc"));
+    const snapshot = await getDocs(q);
+    const symbols = snapshot.docs.map((doc) => doc.data().symbol).filter(Boolean);
+    return getStockQuotes(symbols.length > 0 ? symbols : DEFAULT_TICKERS);
+  } catch (err) {
+    console.error("[HOME] Tickers fetch error:", err.message);
+    return getStockQuotes(DEFAULT_TICKERS);
+  }
+}
+
 export default async function Home() {
-  const [ownNews, hnNews, episodes, hackathons, insights, vcNews, marketViews] = await Promise.all([
+  const [ownNews, hnNews, episodes, hackathons, insights, vcNews, marketViews, stockQuotes] = await Promise.all([
     getOwnNews(),
     getHackerNewsAI(),
     getAllInVideos(),
@@ -55,6 +69,7 @@ export default async function Home() {
     getIndustryInsights(),
     getVCInvestorNews(),
     getMarketViews(),
+    getStockTable(),
   ]);
 
   const highlights = ownNews.filter((item) => item.highlight);
@@ -69,6 +84,7 @@ export default async function Home() {
         <AINewsSection highlights={highlights} today={today} week={week} />
         <IndustryInsightsSection items={insights} />
         <VCInvestorSection items={vcNews} />
+        <StockTableSection quotes={stockQuotes} />
         <MarketViewsSection items={marketViews} />
         <PodcastSection episodes={episodes} />
         <HackathonSection events={hackathons} />

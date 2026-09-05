@@ -109,7 +109,7 @@ export default function AdminProducts() {
         </div>
       </nav>
 
-      <main style={{ padding: "40px 32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
+      <main style={{ padding: "40px 32px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40 }}>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 24 }}>
             {editingId ? "Edit Product" : "New Product"}

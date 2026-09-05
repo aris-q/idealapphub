@@ -16,6 +16,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    match /tickers/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
     // Everything else stays locked.
     match /{document=**} {
       allow read, write: if false;

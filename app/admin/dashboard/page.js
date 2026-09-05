@@ -49,7 +49,7 @@ export default function AdminDashboard() {
       </nav>
       <main style={{ padding: "40px 32px" }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", marginBottom: 32 }}>Admin Panel</h1>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16, maxWidth: 600 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, maxWidth: 600 }}>
           <div onClick={() => router.push("/admin/news")} style={{ background: "#0f1628", border: "1px solid #1a2a4a", borderRadius: 8, padding: 24, cursor: "pointer" }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>News & Updates</h2>
             <p style={{ fontSize: 11, color: "#7a9cc8" }}>Add, edit or remove news posts</p>
@@ -57,6 +57,10 @@ export default function AdminDashboard() {
           <div onClick={() => router.push("/admin/products")} style={{ background: "#0f1628", border: "1px solid #1a2a4a", borderRadius: 8, padding: 24, cursor: "pointer" }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Products</h2>
             <p style={{ fontSize: 11, color: "#7a9cc8" }}>Add, edit or remove products</p>
+          </div>
+          <div onClick={() => router.push("/admin/tickers")} style={{ background: "#0f1628", border: "1px solid #1a2a4a", borderRadius: 8, padding: 24, cursor: "pointer" }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Stock Tickers</h2>
+            <p style={{ fontSize: 11, color: "#7a9cc8" }}>Add or remove tickers shown in AI Stock Watch</p>
           </div>
           <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" style={{ background: "#0f1628", border: "1px solid #1a2a4a", borderRadius: 8, padding: 24, cursor: "pointer", textDecoration: "none", display: "block" }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Site Analytics ↗</h2>
