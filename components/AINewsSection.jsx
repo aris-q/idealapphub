@@ -27,7 +27,7 @@ function formatDate(ts) {
 function NewsRow({ item }) {
   return (
     <a href={item.link || "#"} target={item.link ? "_blank" : undefined} rel="noopener noreferrer" style={{
-      display: "flex", alignItems: "baseline", gap: 12, padding: "10px 12px",
+      display: "flex", alignItems: "baseline", gap: 12, padding: "10px 12px", flexWrap: "wrap",
       background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6,
       marginBottom: 8, textDecoration: "none"
     }}>
@@ -35,14 +35,14 @@ function NewsRow({ item }) {
         {formatDate(item.ts)}
       </span>
       <SourceBadge source={item.source} />
-      <span style={{ fontSize: 12, color: "var(--text-primary)", lineHeight: 1.5 }}>{item.title}</span>
+      <span style={{ fontSize: 12, color: "var(--text-primary)", lineHeight: 1.5, flex: "1 1 200px", minWidth: 0 }}>{item.title}</span>
     </a>
   );
 }
 
 export default function AINewsSection({ highlights = [], today = [], week = [] }) {
   return (
-    <section id="news" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
+    <section id="news" style={{ padding: "40px clamp(16px, 5vw, 32px)", borderBottom: "1px solid var(--border)" }}>
       <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>
         <Icon name="news" size={20} />
         AI News & Updates

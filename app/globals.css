@@ -19,6 +19,19 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Courier New', monospace;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; }
+
+/* Navbar: hamburger-collapsed link list on narrow screens. */
+.nav-toggle { display: none; }
+.nav-links { display: flex; gap: 8px; font-size: 12px; flex-wrap: wrap; justify-content: flex-end; order: 3; }
+@media (max-width: 760px) {
+  .nav-toggle { display: flex; }
+  .nav-links { display: none; width: 100%; flex-direction: column; align-items: stretch; }
+  .nav-links.open { display: flex; }
+  .nav-row { flex-wrap: wrap; }
 }
 
 html {

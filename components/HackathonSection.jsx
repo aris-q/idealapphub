@@ -23,7 +23,7 @@ export default function HackathonSection({ events = [] }) {
   });
 
   return (
-    <section id="hackathons" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
+    <section id="hackathons" style={{ padding: "40px clamp(16px, 5vw, 32px)", borderBottom: "1px solid var(--border)" }}>
       <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
         <Icon name="event" size={20} />
         Hackathons

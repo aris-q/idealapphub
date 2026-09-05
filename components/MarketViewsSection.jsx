@@ -18,7 +18,7 @@ function TickerBadge({ ticker }) {
 function MarketRow({ item }) {
   return (
     <a href={item.link} target="_blank" rel="noopener noreferrer" style={{
-      display: "flex", alignItems: "baseline", gap: 12, padding: "10px 12px",
+      display: "flex", alignItems: "baseline", gap: 12, padding: "10px 12px", flexWrap: "wrap",
       background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6,
       marginBottom: 8, textDecoration: "none"
     }}>
@@ -26,14 +26,14 @@ function MarketRow({ item }) {
         {formatDate(item.ts)}
       </span>
       <TickerBadge ticker={item.ticker} />
-      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.5 }}>{item.title}</span>
+      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.5, flex: "1 1 200px", minWidth: 0 }}>{item.title}</span>
     </a>
   );
 }
 
 export default function MarketViewsSection({ items = [] }) {
   return (
-    <section id="markets" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
+    <section id="markets" style={{ padding: "40px clamp(16px, 5vw, 32px)", borderBottom: "1px solid var(--border)" }}>
       <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
         <Icon name="market" size={20} />
         Market Views

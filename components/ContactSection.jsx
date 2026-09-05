@@ -11,8 +11,8 @@ export default function ContactSection() {
   };
   const inputStyle = { width: "100%", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 4, padding: "10px 12px", color: "var(--text-primary)", fontSize: 12, fontFamily: "'Courier New', monospace", marginBottom: 10, outline: "none" };
   return (
-    <section id="contact" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
+    <section id="contact" style={{ padding: "40px clamp(16px, 5vw, 32px)", borderBottom: "1px solid var(--border)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 48 }}>
         <div>
           <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 12 }}>
             <Icon name="contact" size={20} />

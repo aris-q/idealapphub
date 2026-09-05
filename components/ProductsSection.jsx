@@ -6,12 +6,12 @@ export default function ProductsSection({ products = [] }) {
   ];
   const items = products.length > 0 ? products : placeholder;
   return (
-    <section id="products" style={{ padding: "40px 32px", borderBottom: "1px solid var(--border)" }}>
+    <section id="products" style={{ padding: "40px clamp(16px, 5vw, 32px)", borderBottom: "1px solid var(--border)" }}>
       <h2 style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 24 }}>
         <Icon name="products" size={20} />
         Our Products
       </h2>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
         {items.map((product) => (
           <div key={product.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, overflow: "hidden" }}>
             <div style={{ height: 120, background: "#060910", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
